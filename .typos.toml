@@ -1,0 +1,7 @@
+[default.extend-words]
+HashiCorp = "HashiCorp"
+hashicorp = "hashicorp"
+
+[default.extend-identifiers]
+HashiCorp = "HashiCorp"
+hashicorp = "hashicorp"
