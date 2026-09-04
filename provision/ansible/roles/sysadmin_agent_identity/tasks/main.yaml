@@ -1,0 +1,81 @@
+---
+# tasks file for sysadmin_agent_identity
+
+- name: Ensure sysadmin-agent group exists
+  ansible.builtin.group:
+    name: sysadmin-agent
+    state: present
+
+- name: Ensure sysadmin-agent user exists
+  ansible.builtin.user:
+    name: sysadmin-agent
+    group: sysadmin-agent
+    groups: sudo
+    append: true
+    shell: /bin/bash
+    home: /home/sysadmin-agent
+    create_home: true
+    state: present
+
+- name: Deploy sudoers policy for sysadmin-agent
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/99-sysadmin-agent
+    content: |
+      sysadmin-agent ALL=(ALL) NOPASSWD: /usr/bin/systemctl, /usr/bin/apt, /usr/bin/apt-get, /usr/bin/dpkg, /usr/bin/crictl, /usr/bin/kubeadm, /usr/bin/kubelet, /usr/bin/nvidia-smi, /usr/bin/tegrastats, /usr/bin/journalctl
+    owner: root
+    group: root
+    mode: '0440'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Deploy SSH CA trusted public key
+  ansible.builtin.copy:
+    dest: /etc/ssh/trusted-user-ca-keys.pem
+    content: "{{ ssh_ca_trusted_keys | default('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCn1FgWAOByDV/ee2AVj7UoHPxAGfG/ralalyfaTBfDh3ecPr1hac02skmw3YhnTL2aR8atJCY2DD63brU4fKma7EyTPxbXeJW0n0nmChl+I+L35PQtvZ7dcWPPznbS5G5Lk2PoAY0m3IBJJtbq3MgazOuww8dVDtciFOQBrc8Cglh+iuL1r7i9kBDDO8ZpmjrEAAH2HWaGO5AWuJnxZAUIAD8sv+Lv84d03LMuTrMyZBrq6csIcdmtPoewv1ay/JPUUCCsKI53fvClr2bdUhlW6wwfeq0iN7Nj+ygDziM8+npAxx6jUthG+VTcINKeaLMBUZ1DxAeIXNLPe2ZkH945cVdmHeKinJrAGQDnLArMaoVvC3rugq5lj/WuU3pnR4dgrkfWByVO5aNtsFv4i9nUHCcuWzU5OXArsVolC2gk792oesIbuZCtDzEZYisy4zJ09Aq/toBZXTG1Zb2FJkYCtyWSJ1Lmn6FVfX6jy7V5ktSptb+sznwHu089ch7U0gE= cardno:11_138_351') }}\n"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configure sshd_config for TrustedUserCAKeys
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?TrustedUserCAKeys'
+    line: 'TrustedUserCAKeys /etc/ssh/trusted-user-ca-keys.pem'
+    state: present
+    validate: '/usr/sbin/sshd -t -f %s'
+  notify: Reload sshd
+
+- name: Configure sshd_config for AuthorizedPrincipalsFile
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AuthorizedPrincipalsFile'
+    line: 'AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u'
+    state: present
+    validate: '/usr/sbin/sshd -t -f %s'
+  notify: Reload sshd
+
+- name: Ensure auth_principals directory exists
+  ansible.builtin.file:
+    path: /etc/ssh/auth_principals
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy authorized principals for sysadmin-agent
+  ansible.builtin.copy:
+    dest: /etc/ssh/auth_principals/sysadmin-agent
+    content: |
+      sysadmin-agent
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy authorized principals for nick
+  ansible.builtin.copy:
+    dest: /etc/ssh/auth_principals/nick
+    content: |
+      nick
+      sysadmin-agent
+    owner: root
+    group: root
+    mode: '0644'

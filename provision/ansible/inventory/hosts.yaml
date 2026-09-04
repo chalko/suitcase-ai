@@ -1,0 +1,19 @@
+all:
+  children:
+    colt_hypervisors:
+      hosts:
+        colt-cp-01:
+          ansible_host: 10.82.0.2
+    colt_accelerators:
+      hosts:
+        colt-gpu-01:
+          ansible_host: 10.82.0.3
+    colt_fleet:
+      children:
+        colt_hypervisors:
+        colt_accelerators:
+      vars:
+        ansible_user: colt-sysadmin-agent
+        ansible_ssh_private_key_file: /home/luna-mayor-agent/luna/rigs/suitcase-ai/agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        ansible_become: true

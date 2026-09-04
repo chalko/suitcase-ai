@@ -1,0 +1,7 @@
+---
+# handlers file for sysadmin_agent_identity
+
+- name: Reload sshd
+  ansible.builtin.service:
+    name: sshd
+    state: reloaded

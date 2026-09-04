@@ -1,0 +1,35 @@
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+
+# Gas City
+.beads/*
+!.beads/identity.toml
+
+# Agent keys and secrets protection
+agent-keys/
+*.key
+*.pem
+id_ed25519*
+!id_ed25519*.pub
+!id_ed25519*-cert.pub
+
+# Gas City & Workspace Cache
+.gc/
+.agents/hooks.json
+rigs/
+
+# Terraform / OpenTofu
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.tfstate.lock.info
