@@ -59,6 +59,10 @@ resource "proxmox_virtual_environment_container" "colt_vault" {
   }
 
   start_on_boot = true
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 output "colt_vault_ip" {

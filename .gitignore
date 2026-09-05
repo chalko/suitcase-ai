@@ -33,3 +33,9 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 .terraform.tfstate.lock.info
+
+# Kubernetes & Talos cluster credentials
+colt-kubeconfig
+colt-talosconfig
+*-kubeconfig
+*-talosconfig

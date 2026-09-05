@@ -45,9 +45,9 @@ variable "colt_k8s_nodes" {
       cores     = 2
       memory    = 2560
       disk      = 30
-      ip        = "10.82.20.2/24"
-      gateway   = "10.82.20.1"
-      dns       = ["10.5.110.3", "10.82.20.1"]
+      ip        = "10.82.0.10/24"
+      gateway   = "10.82.0.1"
+      dns       = ["10.5.110.3", "10.82.0.1"]
       mac       = "BC:24:11:82:20:02"
     }
     "colt-worker-01" = {
@@ -56,9 +56,9 @@ variable "colt_k8s_nodes" {
       cores     = 4
       memory    = 6144
       disk      = 100
-      ip        = "10.82.20.13/24"
-      gateway   = "10.82.20.1"
-      dns       = ["10.5.110.3", "10.82.20.1"]
+      ip        = "10.82.0.13/24"
+      gateway   = "10.82.0.1"
+      dns       = ["10.5.110.3", "10.82.0.1"]
       mac       = "BC:24:11:82:20:13"
     }
   }
@@ -67,7 +67,7 @@ variable "colt_k8s_nodes" {
 
 variable "proxmox_node" {
   type        = string
-  default     = "colt-cp-01"
+  default     = "misty"
   description = "Target Proxmox node name"
 }
 
