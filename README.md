@@ -52,7 +52,14 @@ The cluster is housed in a 3D-printed 10-inch modular rack ([ButterflyRack](http
 
 ---
 
-## 🖥️ Deployed Virtual Machines & Core Services
+### Bare-Metal Fleet Hosts
+
+| Hostname          | Role                                                 | IP Address  | Access Method                      |  Status   |
+| :---------------- | :--------------------------------------------------- | :---------- | :--------------------------------- | :-------: |
+| **`colt-cp-01`**  | Proxmox VE 9.2 Hypervisor (Minisforum MS-01 / UM760) | `10.82.0.2` | OpenSSH CA (`colt-sysadmin-agent`) | 🟢 Active |
+| **`colt-gpu-01`** | DGX OS / Inference Node (ASUS Ascent GX10 GB10)      | `10.82.0.3` | OpenSSH CA (`colt-sysadmin-agent`) | 🟢 Active |
+
+---
 
 All virtual infrastructure is provisioned declaratively on `colt-cp-01` via Terraform:
 
@@ -75,6 +82,21 @@ All virtual infrastructure is provisioned declaratively on `colt-cp-01` via Terr
 3. **Pragmatic Networking:**
    - Operates on an internal `10.82.0.0/16` network (gateway `10.82.0.1`) with DHCP constrained to `10.82.250.x` to prevent address collisions with static infrastructure.
    - Ingress uses `ingress-nginx` configured as a `hostNetwork` DaemonSet on the worker node, avoiding the overhead of external BGP/VIP load balancers on a small cluster.
+
+---
+
+## 🌫️ Fog Legacy Workloads (Co-located)
+
+Personal homelab workloads that ideally belong on separate physical hardware, but are co-located on `colt-cp-01` to make the best use of available physical capacity:
+
+- **Segregated Management:** Allocations are declared in [`provision/fog/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/fog/) for hypervisor tracking, but in-guest OS configurations and application workloads are managed externally.
+- **Network Isolation:** All Fog resources run on a dedicated, isolated VLAN (**VLAN 613** on `10.7.82.0/24`) and do not route into the Camp Colt `10.82.0.0/16` fabric.
+
+| VMID        | Guest Name       | Type           | Allocated Resources          | Network                 | Role                         |
+| :---------- | :--------------- | :------------- | :--------------------------- | :---------------------- | :--------------------------- |
+| **CT 9090** | `vault`          | Debian 12 LXC  | 1 vCPU, 1GB RAM, 16GB disk   | `10.7.82.90` (VLAN 613) | Fog Vault & Root CA          |
+| **VM 9010** | `k8s-control-01` | Talos Linux VM | 2 vCPU, 4GB RAM, 40GB disk   | `10.7.82.15` (VLAN 613) | Fog Kubernetes Control Plane |
+| **VM 9020** | `k8s-worker-01`  | Talos Linux VM | 6 vCPU, 12GB RAM, 150GB disk | `10.7.82.16` (VLAN 613) | Fog Kubernetes Worker        |
 
 ---
 
