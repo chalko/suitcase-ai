@@ -159,8 +159,8 @@ kubectl get pods -A
 │   ├── HARDWARE.md        # Physical packaging, CAD models, thermals, and power
 │   ├── PROXMOX_OPERATIONS.md
 │   └── SECURITY.md        # OpenSSH CA, Non-Human Identity, and trust configuration
-├── plans/                 # System bootstrap plans and cutover runbooks
-│   └── colt_vault_bootstrap_plan.md
+├── plans/                 # Architecture implementation and cutover plans
+│   └── completed/         # Archival of completed bootstrap runbooks
 ├── provision/             # Declarative Terraform manifests
 │   ├── colt_talos.tf      # Talos Linux Kubernetes cluster definitions
 │   ├── colt_vault.tf      # HashiCorp Vault LXC definition

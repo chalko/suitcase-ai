@@ -11,11 +11,8 @@ within the Suitcase AI initiative.
 - **Camp Colt Sysadmin (`colt-sysadmin`)**: Primary infrastructure administrator
   responsible for bare-metal hypervisors, GPU nodes, Talos Linux Kubernetes
   clusters, and sovereign secrets management.
-- **Strategic Theater Director**: Margaret "Peggy" Carter (`scai/peggy`),
-  coordinating cross-rig strategy, architecture specifications, and tactical
-  handovers.
-- **Executive Officer & Mayor**: Tactical leadership for appliance workloads and
-  agent operations.
+- **Platform & Workload Operator**: Responsible for staging platform services
+  (Ingress, LiteLLM gateway, Dolt database, and monitoring).
 
 ---
 
@@ -29,7 +26,7 @@ within the Suitcase AI initiative.
    - **Configuration Management:** Use **Ansible**
      (`provision/ansible/inventory/hosts.yaml`) with OpenSSH CA certificate
      authentication.
-   - **Secret Management:** Use **HashCorp Vault** (`colt-vault` @
+   - **Secret Management:** Use **HashiCorp Vault** (`colt-vault` @
      `10.82.0.5:8200`). Never hardcode or print raw credentials.
 
 2. **Zero-Secret / Least Privilege:**
@@ -43,10 +40,10 @@ within the Suitcase AI initiative.
 
 3. **Operational Segregation:**
 
-   - Camp Colt operates on an independent subnet (`10.82.0.0/24`).
+   - Camp Colt operates on the `10.82.0.0/16` appliance network (gateway `10.82.0.1`).
    - Hypervisor allocations for legacy Fog workloads (`provision/fog/`) are
-     strictly segregated at the resource boundary; in-guest OS configurations
-     belong to `fog/kaylee`.
+     strictly segregated at the resource boundary on VLAN 613; in-guest OS configurations
+     are managed externally.
 
 4. **Verification Before Assertion:**
    - Always run pre-flight syntax checks, dry-run plans (`terraform plan`), and

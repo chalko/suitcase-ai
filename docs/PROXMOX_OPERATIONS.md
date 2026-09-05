@@ -1,9 +1,10 @@
 # Camp Colt Proxmox VE Operations Runbook
 
-**Target Hypervisor:** `colt-cp-01` (Minisforum MS-01) **Management IP:**
-`10.82.0.2` **Web GUI & API:** `https://10.82.0.2:8006/` **Operating System:**
-Proxmox VE 9.2.5 (Debian 12, Kernel 7.0.14-6-pve) **Primary Administrator:**
-`colt-sysadmin` (`colt-sysadmin-agent`)
+**Target Hypervisor:** `colt-cp-01` (Minisforum MS-01 / UM760 Slim)
+**Management IP:** `10.82.0.2/16`
+**Web GUI & API:** `https://10.82.0.2:8006/`
+**Operating System:** Proxmox VE 9.2.5 (Debian 12, Kernel 7.0.14-6-pve)
+**Primary Administrator:** `colt-sysadmin` (`colt-sysadmin-agent`)
 
 ---
 
@@ -11,32 +12,32 @@ Proxmox VE 9.2.5 (Debian 12, Kernel 7.0.14-6-pve) **Primary Administrator:**
 
 ### OpenSSH CA Host Access
 
-Administrative access to `colt-cp-01` is secured via OpenSSH CA certificates.
-Passwordless `sudo` is enabled.
+Administrative access to `colt-cp-01` is secured via OpenSSH CA certificates signed by Vault. Passwordless `sudo` is enabled for the service identity.
 
 - **Convenience SSH Wrapper:**
 
   ```bash
-  /home/luna-mayor-agent/luna/rigs/suitcase-ai/scripts/ssh_colt_cp.sh
+  ./scripts/ssh_colt_cp.sh
   ```
 
 - **Manual SSH:**
 
   ```bash
-  ssh -i ~/.ssh/agents/id_ed25519_colt_sysadmin_agent colt-sysadmin-agent@10.82.0.2
+  ssh -i agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent \
+      -i agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent-cert.pub \
+      colt-sysadmin-agent@10.82.0.2
   ```
 
 ### Proxmox VE API Token
 
-Dedicated OpenTofu/automation token configured with full `Administrator` role on
-`/`:
+Dedicated automation token configured with the `Administrator` role on `/`:
 
 - **Token ID:** `colt-admin@pve!tofu`
 - **Vault Secret Path:** `secret/colt/proxmox` on `http://10.82.0.5:8200`
 - **Environment Loader:**
 
   ```bash
-  source /home/luna-mayor-agent/luna/rigs/suitcase-ai/scripts/load_colt_env.sh
+  source ./scripts/load_colt_env.sh
   ```
 
 ---
@@ -47,50 +48,43 @@ Dedicated OpenTofu/automation token configured with full `Administrator` role on
 
 Manages native Camp Colt Kubernetes nodes and security infrastructure:
 
-- **`colt-vault`** (CT 9190 @ `10.82.0.5/24`)
-- **`colt-control-01`** (VM 9110 @ `10.82.20.2/24`)
-- **`colt-worker-01`** (VM 9120 @ `10.82.20.13/24`)
+- **`colt-vault`** (CT 9190 @ `10.82.0.5/16`)
+- **`colt-control-01`** (VM 9110 @ `10.82.20.10/16`)
+- **`colt-worker-01`** (VM 9120 @ `10.82.20.13/16`)
 
 Execute plan/apply:
 
 ```bash
-cd /home/luna-mayor-agent/luna/rigs/suitcase-ai/provision
-source ../scripts/load_colt_env.sh
-terraform plan
-terraform apply
+source ./scripts/load_colt_env.sh
+terraform -chdir=provision plan
+terraform -chdir=provision apply
 ```
 
 ### Fog Workloads Hypervisor Allocation (`provision/fog/`)
 
-Manages hypervisor-level resource allocations (CPU, RAM, disk, power state) for
-legacy Fog nodes:
+Manages hypervisor-level resource allocations (CPU, RAM, disk, power state) for legacy Fog nodes:
 
-- **`k8s-control-01`** (VM 9010)
-- **`k8s-worker-01`** (VM 9020)
-- **`vault`** (CT 9090)
+- **`k8s-control-01`** (VM 9010 @ VLAN 613)
+- **`k8s-worker-01`** (VM 9020 @ VLAN 613)
+- **`vault`** (CT 9090 @ VLAN 613)
 
-> **Operational Scope Boundary:** `colt-sysadmin` manages hypervisor uptime,
-> virtual hardware allocations, and power states in `provision/fog/`. In-guest
-> Talos operating systems and Kubernetes service workloads remain within the
-> operational domain of `fog/kaylee`.
+> **Operational Scope Boundary:** `colt-sysadmin` manages hypervisor uptime, virtual hardware allocations, and power states in `provision/fog/`. In-guest Talos operating systems and service workloads are managed externally.
 
 Execute plan:
 
 ```bash
-cd /home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/fog
-source ../../scripts/load_colt_env.sh
-terraform plan
+source ./scripts/load_colt_env.sh
+terraform -chdir=provision/fog plan
 ```
 
 ---
 
 ## 3. Ansible Fleet Management
 
-Ansible inventory is pre-configured at `provision/ansible/inventory/hosts.yaml`.
-Run ping check:
+Ansible inventory is configured at `provision/ansible/inventory/hosts.yaml`. Run connectivity check:
 
 ```bash
-ansible -i /home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/ansible/inventory/hosts.yaml colt_fleet -m ping
+ansible -i provision/ansible/inventory/hosts.yaml colt_fleet -m ping
 ```
 
 ---
@@ -98,12 +92,13 @@ ansible -i /home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/ansible/invent
 ## 4. Vault Lifecycle & Disaster Recovery
 
 - **Vault Web UI & API:** `http://10.82.0.5:8200`
-- **Credentials:**
-  `/home/luna-mayor-agent/luna/rigs/suitcase-ai/agent-keys/vault/colt-vault-credentials.json`
+- **Credentials Record:** `agent-keys/vault/colt-vault-credentials.json`
 - **Unseal Procedure (upon container or hypervisor reboot):**
 
   ```bash
-  KEY=$(jq -r '.unseal_keys_b64[0]' /home/luna-mayor-agent/luna/rigs/suitcase-ai/agent-keys/vault/colt-vault-credentials.json)
-  ssh -i ~/.ssh/agents/id_ed25519_colt_sysadmin_agent colt-sysadmin-agent@10.82.0.2 \
-    "sudo pct exec 9190 -- env VAULT_ADDR=http://127.0.0.1:8200 vault operator unseal $KEY"
+  KEY=$(jq -r '.unseal_keys_b64[0]' agent-keys/vault/colt-vault-credentials.json)
+  ssh -i agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent \
+      -i agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent-cert.pub \
+      colt-sysadmin-agent@10.82.0.2 \
+      "sudo /usr/sbin/pct exec 9190 -- env VAULT_ADDR=http://127.0.0.1:8200 vault operator unseal $KEY"
   ```
