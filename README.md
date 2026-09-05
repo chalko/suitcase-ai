@@ -72,8 +72,10 @@ physical hardware:
 ├─────┬───────────────────────────────────────────────────────┤
 │ 8U  │ [ Upper Convective Airflow & Cable Slack Clearance ]   │
 ├─────┼───────────────────────────────────────────────────────┤
-│ 6-7U│ ASUS Ascent GX10 (NVIDIA GB10 Superchip, 128GB Unified│
+│ 7U  │ ASUS Ascent GX10 (NVIDIA GB10 Superchip, 128GB Unified│
 │     │ Memory) + 4TB USB NVMe SSD (Local Model Weight Cache) │
+├─────┼───────────────────────────────────────────────────────┤
+│ 6U  │ 14-Port Patch Panel                                   │
 ├─────┼───────────────────────────────────────────────────────┤
 │ 5U  │ 1G Managed Switch (Native VLAN 82 Management Fabric)  │
 ├─────┼───────────────────────────────────────────────────────┤
@@ -142,7 +144,7 @@ generator circuits** while remaining under strict acoustic and thermal ceilings:
 
 ## 🔒 Security Architecture & Zero-Secret Governance
 
-Suitcase AI enforces an enterprise-grade **Zero-Secret Security Model** designed
+Suitcase AI enforces a **Zero-Secret Security Model** designed
 to prevent prompt injection credential extraction, accidental git leaks, and
 privilege creep:
 
@@ -157,9 +159,6 @@ privilege creep:
 3. **Immutable Operating Systems**: Kubernetes nodes utilize **Talos Linux**—an
    immutable, API-driven Linux distribution devoid of SSH, shell utilities, or
    interactive package managers, dramatically reducing the host attack surface.
-4. **Sandboxed Code Execution**: Untrusted agent-generated code runs inside
-   ephemeral Kubernetes pods isolated by **gVisor** (`runsc`) sandboxes with
-   disabled egress networking (`--network none`).
 
 ---
 
@@ -186,10 +185,7 @@ Suitcase AI follows a phased engineering roadmap with distinct milestones:
 ├────────────────────────────────────────────────────────────────────────┤
 │ Phase 3: Hardware Expansion & Multi-Node Scale              [PLANNED]  │
 ├────────────────────────────────────────────────────────────────────────┤
-│ • [ ] Suitcase Compute Expansion Module (additional 1–3 GX10 nodes)    │
-│ • [ ] Scale system VRAM to 256GB–512GB over 25G/100G RoCEv2 fabric     │
 │ • [ ] Flush 9U front-panel HMI console (7" Touch LCD + ReSpeaker mic)  │
-│ • [ ] Full air-gapped local model cache mirror (Olah on NVMe NAS)      │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
