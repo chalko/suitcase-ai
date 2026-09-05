@@ -1,4 +1,4 @@
-# Suitcase AI: Ultra-Compact Sovereign AI Cluster & Agent Factory
+# Suitcase AI: Compact Sovereign Compute Cluster
 
 ![Architecture: Sovereign Offline-First](https://img.shields.io/badge/Architecture-Offline--First-blue.svg)
 ![Compute: NVIDIA Grace Blackwell](https://img.shields.io/badge/Compute-NVIDIA_Grace_Blackwell_GB10-green.svg)
@@ -6,15 +6,13 @@
 ![Secrets: HashiCorp Vault](https://img.shields.io/badge/Secrets-HashiCorp_Vault-000000.svg)
 ![Security: Zero--Secret NHI](https://img.shields.io/badge/Security-Zero--Secret_NHI-red.svg)
 
-**Suitcase AI** is an open-source engineering blueprint and reference
-implementation for a complete, self-contained AI agent factory and compute
-cluster housed in an ultra-compact 10" mini-rack form factor.
+**Suitcase AI** is an engineering blueprint and infrastructure-as-code repository
+for a self-contained homelab compute cluster housed in an ultra-compact 10"
+mini-rack form factor (Camp Colt).
 
-Engineered for a homelab with an eye towards future field mobility, austere
-environments, and edge operational autonomy, Suitcase AI executes multi-agent
-reasoning, local model serving, vector indexing, and GitOps workflows **100%
-offline and air-gapped**, with optional WAN egress through intelligent proxy
-fallbacks.
+The cluster is designed for local model serving, offline experimentation, and
+GitOps automation with a focus on sovereign data and secrets management. Infrastructure
+is defined declaratively using Terraform, Proxmox VE, Talos Linux, and HashiCorp Vault.
 
 ---
 
@@ -28,7 +26,7 @@ persistent state, and identity:
 ```mermaid
 flowchart TD
     subgraph Network["Network & Traffic Management"]
-        SwitchRouter["Switch / Router<br/><i>(Subnet Isolation, VLAN Routing, Ingress VIPs)</i>"]
+        SwitchRouter["Switch / Router<br/><i>(Subnet Routing, Port Forwarding)</i>"]
     end
 
     subgraph Security["Sovereign Identity & PKI"]
@@ -96,8 +94,8 @@ physical hardware:
   `10.82.0.3` running NVIDIA DGX OS with unified memory architecture housing the
   **NVIDIA GB10 Superchip (128GB unified memory)** paired with an external 4TB
   USB NVMe SSD for high-throughput model weight storage.
-- **Physical Network Fabric**: Dedicated physical links operating on the native
-  Camp Colt subnet (`10.82.0.0/24`, VLAN 82) with verified sub-1.3ms
+- **Physical Network Fabric**: Dedicated physical links operating on the
+  Camp Colt subnet (`10.82.0.0/16`, gateway `10.82.0.1`) with sub-1.5ms
   host-to-host latency.
 
 ### 2. Identity & Access Governance (Non-Human Identities)
@@ -126,19 +124,19 @@ physical hardware:
 
 ## ⚙️ Hardware Specifications & Bill of Materials
 
-The cluster is engineered to run on standard **120V / 15A household or portable
-generator circuits** while remaining under strict acoustic and thermal ceilings:
+The cluster is engineered to run on standard **120V / 15A household circuits**
+while remaining under strict acoustic and thermal ceilings:
 
-| Component             | Hardware Model                                                     | Key Specifications                                   | Role in Cluster                        |  Status   |
-| :-------------------- | :----------------------------------------------------------------- | :--------------------------------------------------- | :------------------------------------- | :-------: |
-| **Chassis**           | [ButterflyRack](https://github.com/axiopaladin/ButterflyRack) (8U) | Modular 3D-printable 10" rack with metal rack rails  | Structural cluster housing             | 🟢 Active |
-| **GPU Node**          | ASUS Ascent GX10                                                   | NVIDIA Grace Blackwell GB10, 128GB Unified Memory    | Local LLM inference & embeddings       | 🟢 Active |
-| **Model Hot Cache**   | 4TB USB NVMe SSD                                                   | USB 3.2 Gen2 (10Gbps) External NVMe Drive            | Fast model weights storage for GX10    | 🟢 Active |
-| **Hypervisor Host**   | Minisforum UM760 Slim                                              | AMD Ryzen 5 7640HS, 32GB DDR5 5600, 1TB NVMe, 2.5GbE | Proxmox VE, K8s VMs, Vault LXC         | 🟢 Active |
-| **Network Switch**    | 1G Managed Switch                                                  | 8-Port Managed Switch (VLAN 82, MTU 9000)            | Data Plane & Management Fabric         | 🟢 Active |
-| **Secrets Engine**    | Proxmox LXC 9190                                                   | HashiCorp Vault 2.1 on Debian 12 Minimal             | Local PKI & Non-Human Identity auth    | 🟢 Active |
-| **K8s Control Plane** | Talos Linux VM 9110                                                | 2 vCPU, 4GB RAM, 40GB NVMe (`10.82.20.2`)            | Immutable Kubernetes Control Plane     | 🟡 Staged |
-| **K8s Worker**        | Talos Linux VM 9120                                                | 4 vCPU, 12GB RAM, 100GB NVMe (`10.82.20.13`)         | Platform workloads, Dolt, Ingress VIPs | 🟡 Staged |
+| Component             | Hardware Model                                                     | Key Specifications                                   | Role in Cluster                            |  Status   |
+| :-------------------- | :----------------------------------------------------------------- | :--------------------------------------------------- | :----------------------------------------- | :-------: |
+| **Chassis**           | [ButterflyRack](https://github.com/axiopaladin/ButterflyRack) (8U) | Modular 3D-printable 10" rack with metal rack rails  | Structural cluster housing                 | 🟢 Active |
+| **GPU Node**          | ASUS Ascent GX10                                                   | NVIDIA Grace Blackwell GB10, 128GB Unified Memory    | Local LLM inference & embeddings           | 🟢 Active |
+| **Model Hot Cache**   | 4TB USB NVMe SSD                                                   | USB 3.2 Gen2 (10Gbps) External NVMe Drive            | Fast model weights storage for GX10        | 🟢 Active |
+| **Hypervisor Host**   | Minisforum UM760 Slim                                              | AMD Ryzen 5 7640HS, 32GB DDR5 5600, 1TB NVMe, 2.5GbE | Proxmox VE, K8s VMs, Vault LXC             | 🟢 Active |
+| **Network Switch**    | 1G Managed Switch                                                  | 8-Port Managed Switch (10.82.0.0/16, MTU 1500)       | Data Plane & Management Fabric             | 🟢 Active |
+| **Secrets Engine**    | Proxmox LXC 9190                                                   | HashiCorp Vault 2.1 on Debian 12 Minimal             | Local PKI & Non-Human Identity auth        | 🟢 Active |
+| **K8s Control Plane** | Talos Linux VM 9110                                                | 2 vCPU, 2.5GB RAM, 30GB NVMe (`10.82.20.10`)         | Immutable Kubernetes Control Plane (Ready) | 🟢 Active |
+| **K8s Worker**        | Talos Linux VM 9120                                                | 4 vCPU, 6GB RAM, 100GB NVMe (`10.82.20.13`)          | Platform workloads, Ingress (Ready)        | 🟢 Active |
 
 ---
 
@@ -171,16 +169,17 @@ Suitcase AI follows a phased engineering roadmap with distinct milestones:
 │ Phase 1: Physical Underlay & Sovereign Security Baseline    [COMPLETED]│
 ├────────────────────────────────────────────────────────────────────────┤
 │ • [x] 10" Rack layout, physical cabling, and convective thermal paths  │
-│ • [x] Native Camp Colt network cutover (10.82.0.0/24 — VLAN 82)        │
+│ • [x] Native Camp Colt network cutover (10.82.0.0/16)                  │
 │ • [x] OpenSSH CA identity architecture & Non-Human Identity onboarding │
 │ • [x] Sovereign HashiCorp Vault deployment (LXC 9190 @ 10.82.0.5)      │
 ├────────────────────────────────────────────────────────────────────────┤
 │ Phase 2: Tactical Kubernetes Cluster & Platform Services   [IN ACTIVE] │
 ├────────────────────────────────────────────────────────────────────────┤
-│ • [ ] Bootstrap Talos Linux Control Plane (colt-control-01 @ .20.2)    │
-│ • [ ] Bootstrap Talos Linux Worker (colt-worker-01 @ .20.13)           │
-│ • [ ] Deploy MetalLB Ingress VIP pool (10.82.50.0/24)                  │
-│ • [ ] Deploy LiteLLM Proxy Gateway & Dolt SQL Task Database VIPs       │
+│ • [x] Bootstrap Talos Linux Control Plane (colt-control-01 @ .20.10)   │
+│ • [x] Bootstrap Talos Linux Worker (colt-worker-01 @ .20.13)           │
+│ • [ ] Bootstrap Flux CD on camp-colt-k8s                               │
+│ • [ ] Deploy ingress-nginx DaemonSet (hostNetwork mode)                │
+│ • [ ] Deploy LiteLLM Proxy Gateway & Dolt SQL Task Database            │
 │ • [ ] Decommission legacy Fog transition containers (reclaim 16GB RAM) │
 ├────────────────────────────────────────────────────────────────────────┤
 │ Phase 3: Hardware Expansion & Multi-Node Scale              [PLANNED]  │
@@ -194,16 +193,27 @@ Suitcase AI follows a phased engineering roadmap with distinct milestones:
 ## 📂 Repository Structure
 
 ```text
-├── README.md              # Project overview and public architecture guide
-├── hardware/              # 10" rack CAD, power budget, thermals, and BOM
-├── plans/                 # Product requirements, cutover runbooks, and specs
-│   ├── prd.md             # Core Product Requirements Document
-│   └── 0.1/               # Phase 0.1 execution runbooks & verified network plans
-├── software/              # Talos Linux configs, Proxmox specs, and Helm values
-├── scripts/               # Host provisioning and certificate signing utilities
-│   ├── sign_agent_cert.sh # Parameterized OpenSSH CA certificate issuance tool
-│   └── provision_host.sh  # Automated host onboarding script
-└── tools/                 # Operational CLI utilities
+├── AGENTS.md              # Operational roles, guidelines, and agent instructions
+├── README.md              # Project overview and architecture documentation
+├── agent-keys/            # Public keys, OpenSSH CA certs, and identity records
+│   ├── agents/            # Non-Human Identity public keys (colt-sysadmin)
+│   └── vault/             # Vault SSH CA public keys
+├── docs/                  # Operational runbooks, Proxmox procedures, and plans
+│   ├── PROXMOX_OPERATIONS.md
+│   └── plans/
+├── plans/                 # Architecture implementation and bootstrap plans
+│   └── colt_vault_bootstrap_plan.md
+├── provision/             # Terraform infrastructure-as-code manifests
+│   ├── colt_talos.tf      # Talos Linux Kubernetes cluster definitions
+│   ├── colt_vault.tf      # HashiCorp Vault LXC definition
+│   ├── colt_vms.tf        # Proxmox QEMU virtual machine resources
+│   ├── colt_variables.tf  # Network, VMID, and compute sizing variables
+│   ├── ansible/           # Ansible playbooks and inventory
+│   └── fog/               # Segregated hypervisor definitions for legacy Fog
+└── scripts/               # Host onboarding, CA signing, and environment scripts
+    ├── load_colt_env.sh   # Environment loader for Vault and Proxmox API
+    ├── sign_agent_cert.sh # Parameterized OpenSSH CA certificate issuance tool
+    └── ssh_colt_cp.sh     # Quick SSH jump script to colt-cp-01
 ```
 
 ---
