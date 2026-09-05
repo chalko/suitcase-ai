@@ -156,7 +156,9 @@ kubectl get pods -A
 │   ├── agents/            # Non-Human Identity public keys (colt-sysadmin)
 │   └── vault/             # Vault SSH CA public keys
 ├── docs/                  # Operational runbooks and architecture deep-dives
-│   └── PROXMOX_OPERATIONS.md
+│   ├── HARDWARE.md        # Physical packaging, CAD models, thermals, and power
+│   ├── PROXMOX_OPERATIONS.md
+│   └── SECURITY.md        # OpenSSH CA, Non-Human Identity, and trust configuration
 ├── plans/                 # System bootstrap plans and cutover runbooks
 │   └── colt_vault_bootstrap_plan.md
 ├── provision/             # Declarative Terraform manifests
