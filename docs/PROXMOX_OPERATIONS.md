@@ -92,11 +92,20 @@ ansible -i provision/ansible/inventory/hosts.yaml colt_fleet -m ping
 ## 4. Vault Lifecycle & Disaster Recovery
 
 - **Vault Web UI & API:** `http://10.82.0.5:8200`
-- **Credentials Record:** `agent-keys/vault/colt-vault-credentials.json`
+- **Secrets Storage:** Operator local password store (`pass colt/vault/*`). No credentials or unseal keys are stored in this repository or appliance filesystems.
 - **Unseal Procedure (upon container or hypervisor reboot):**
 
+  Operator runs unseal directly from workstation:
+
   ```bash
-  KEY=$(jq -r '.unseal_keys_b64[0]' agent-keys/vault/colt-vault-credentials.json)
+  export VAULT_ADDR="http://10.82.0.5:8200"
+  pass show colt/vault/unseal_key_1 | vault operator unseal -
+  ```
+
+  Or via SSH to `colt-cp-01`:
+
+  ```bash
+  KEY=$(pass show colt/vault/unseal_key_1)
   ssh -i agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent \
       -i agent-keys/agents/colt-sysadmin/id_ed25519_colt_sysadmin_agent-cert.pub \
       colt-sysadmin-agent@10.82.0.2 \
