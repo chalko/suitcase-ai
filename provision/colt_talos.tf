@@ -98,27 +98,3 @@ resource "talos_machine_bootstrap" "colt" {
   depends_on           = [talos_machine_configuration_apply.colt_controlplane]
 }
 
-# Retrieve Camp Colt kubeconfig
-data "talos_cluster_kubeconfig" "colt" {
-  client_configuration = talos_machine_secrets.colt.client_configuration
-  node                 = "10.82.0.10"
-  endpoint             = "10.82.0.10"
-  depends_on           = [talos_machine_bootstrap.colt]
-}
-
-resource "local_file" "colt_kubeconfig" {
-  content  = data.talos_cluster_kubeconfig.colt.kubeconfig_raw
-  filename = "${path.module}/../colt-kubeconfig"
-}
-
-data "talos_client_configuration" "colt" {
-  cluster_name         = "camp-colt-k8s"
-  client_configuration = talos_machine_secrets.colt.client_configuration
-  nodes                = ["10.82.0.10"]
-  endpoints            = ["10.82.0.10"]
-}
-
-resource "local_file" "colt_talosconfig" {
-  content  = data.talos_client_configuration.colt.talos_config
-  filename = "${path.module}/../colt-talosconfig"
-}
