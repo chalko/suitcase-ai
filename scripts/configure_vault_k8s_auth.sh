@@ -8,11 +8,25 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Always use colt-kubeconfig by default
 KUBECONFIG="${KUBECONFIG:-$REPO_ROOT/colt-kubeconfig}"
-VAULT_ADDR="${VAULT_ADDR:-http://10.82.0.5:8200}"
+if [ ! -f "$KUBECONFIG" ] && [ -f "$REPO_ROOT/colt-kubeconfig" ]; then
+    KUBECONFIG="$REPO_ROOT/colt-kubeconfig"
+fi
+
+# Force HTTP endpoint for colt-vault (it listens on plain HTTP at 10.82.0.5:8200)
+export VAULT_ADDR="http://10.82.0.5:8200"
+unset VAULT_CACERT VAULT_CLIENT_CERT VAULT_CLIENT_KEY
 
 if [ -z "${VAULT_TOKEN:-}" ]; then
-    echo "Error: VAULT_TOKEN is not set."
+    if command -v pass >/dev/null 2>&1; then
+        VAULT_TOKEN=$(pass show colt/vault/root_token 2>/dev/null || true)
+    fi
+fi
+
+if [ -z "${VAULT_TOKEN:-}" ]; then
+    echo "Error: VAULT_TOKEN is not set and could not be retrieved from pass."
     echo "Run: export VAULT_TOKEN=\$(pass show colt/vault/root_token)"
     exit 1
 fi
@@ -22,11 +36,13 @@ if [ ! -f "$KUBECONFIG" ]; then
     exit 1
 fi
 
+echo "Ensuring vault-auth RBAC is applied in camp-colt-k8s..."
+kubectl --kubeconfig "$KUBECONFIG" apply -f "$REPO_ROOT/provision/k8s/vault/vault-auth-rbac.yaml"
+
 echo "Retrieving cluster CA and vault-auth token from camp-colt-k8s..."
 K8S_CA_CERT="$(kubectl --kubeconfig "$KUBECONFIG" get secret vault-auth-token -n kube-system -o jsonpath='{.data.ca\.crt}' | base64 -d)"
 TOKEN_REVIEWER_JWT="$(kubectl --kubeconfig "$KUBECONFIG" get secret vault-auth-token -n kube-system -o jsonpath='{.data.token}' | base64 -d)"
 
-export VAULT_ADDR
 export VAULT_TOKEN
 
 echo "Enabling auth/kubernetes in colt-vault ($VAULT_ADDR)..."

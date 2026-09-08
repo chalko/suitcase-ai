@@ -16,7 +16,9 @@ data "talos_machine_configuration" "colt_controlplane" {
     yamlencode({
       machine = {
         install = {
-          disk = "/dev/sda"
+          disk  = "/dev/sda"
+          image = "factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.14.0"
+          wipe  = true
         }
         network = {
           interfaces = [
@@ -49,7 +51,9 @@ data "talos_machine_configuration" "colt_worker" {
     yamlencode({
       machine = {
         install = {
-          disk = "/dev/sda"
+          disk  = "/dev/sda"
+          image = "factory.talos.dev/installer/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515:v1.14.0"
+          wipe  = true
         }
         network = {
           interfaces = [
@@ -74,7 +78,7 @@ resource "talos_machine_configuration_apply" "colt_controlplane" {
   client_configuration        = talos_machine_secrets.colt.client_configuration
   machine_configuration_input = data.talos_machine_configuration.colt_controlplane.machine_configuration
   node                        = "10.82.0.10"
-  endpoint                    = "10.82.0.254"
+  endpoint                    = "10.82.250.100"
   depends_on                  = [proxmox_virtual_environment_vm.colt_k8s_nodes]
 }
 
@@ -82,7 +86,7 @@ resource "talos_machine_configuration_apply" "colt_worker" {
   client_configuration        = talos_machine_secrets.colt.client_configuration
   machine_configuration_input = data.talos_machine_configuration.colt_worker.machine_configuration
   node                        = "10.82.0.13"
-  endpoint                    = "10.82.0.253"
+  endpoint                    = "10.82.250.102"
   depends_on                  = [proxmox_virtual_environment_vm.colt_k8s_nodes]
 }
 
