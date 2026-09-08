@@ -76,6 +76,7 @@ spec:
           command:
             - download-to-cache
           args:
+            - --use-cache
             - --profiles
             - "f3b4963ec6c3826a2377ea80c1dcd05bef1c6267a9eb67805e3872b8fe2151ae"
           env:
