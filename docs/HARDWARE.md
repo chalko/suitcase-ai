@@ -39,36 +39,23 @@ The cluster is housed in an open, modular 10-inch desktop rack based on the **Bu
 
 ### Bill of Materials (BOM) & Parts List
 
-| Component              | Hardware Model                                                   | Physical Dimensions / Mount                          | Key Specs / Power                                               |
-| :--------------------- | :--------------------------------------------------------------- | :--------------------------------------------------- | :-------------------------------------------------------------- |
-| **Chassis**            | [ButterflyRack 8U](https://github.com/axiopaladin/ButterflyRack) | 10" desktop rack (3D printed PETG/ABS + metal rails) | 8U capacity, open convective airflow                            |
-| **GPU Inference Host** | ASUS Ascent GX10                                                 | 2U custom vented shelf (`7-8U`)                      | NVIDIA Grace Blackwell GB10, 128GB unified RAM (~140W–220W TDP) |
-| **Model Weight Cache** | 4TB USB NVMe SSD                                                 | Adhesive bracket / shelf mount (`7-8U`)              | USB 3.2 Gen2 (10Gbps) external NVMe drive (~5W–8W)              |
-| **Patch Panel**        | 14-Port 10" Keystone Panel                                       | 1U 10" metal/printed panel (`6U`)                    | Cat6 RJ-45 shielded keystone couplers                           |
-| **Network Switch**     | Netgear GS108PEv3 (or 8-port 1G Managed)                         | 1U shelf or custom keyhole mount (`5U`)              | 8-port Gigabit (PoE capability, VLAN support, ~15W)             |
-| **Hypervisor Host**    | Minisforum UM760 Slim (or MS-01)                                 | 1.5U–2U tray (`3-4U`)                                | AMD Ryzen 5 7640HS, 32GB DDR5, 1TB NVMe, 2.5GbE (~35W–65W)      |
-| **Power Distribution** | Compact PDU / Power Strip                                        | 1U base shelf (`1-2U`)                               | 120V / 15A input, NEMA 5-15R outlets + OEM DC power bricks      |
+| Component                   | Hardware Model                                                   | Physical Dimensions / Mount                          | Key Specs / Power                                               |
+| :-------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------- | :-------------------------------------------------------------- |
+| **Chassis**                 | [ButterflyRack 8U](https://github.com/axiopaladin/ButterflyRack) | 10" desktop rack (3D printed PETG/ABS + metal rails) | 8U capacity, open convective airflow                            |
+| **GPU Inference Host**      | ASUS Ascent GX10                                                 | 2U custom vented shelf (`7-8U`)                      | NVIDIA Grace Blackwell GB10, 128GB unified RAM (~140W–220W TDP) |
+| **Model Weight Cache**      | 4TB USB NVMe SSD                                                 | Adhesive bracket / shelf mount (`7-8U`)              | USB 3.2 Gen2 (10Gbps) external NVMe drive (~5W–8W)              |
+| **Patch Panel**             | 14-Port 10" Keystone Panel                                       | 1U 10" metal/printed panel (`6U`)                    | Cat6 RJ-45 shielded keystone couplers                           |
+| **Network Switch (`SW07`)** | Netgear GS108E (8-Port Gigabit Plus, non-PoE)                    | 1U 10" shelf mount (`5U`)                            | 8-port Gigabit (802.1Q VLAN support, ~4W max)                   |
+| **Hypervisor Host**         | Minisforum UM760 Slim (or MS-01)                                 | 1.5U–2U tray (`3-4U`)                                | AMD Ryzen 5 7640HS, 32GB DDR5, 1TB NVMe, 2.5GbE (~35W–65W)      |
+| **Power Distribution**      | Compact PDU / Power Strip                                        | 1U base shelf (`1-2U`)                               | 120V / 15A input, NEMA 5-15R outlets + OEM DC power bricks      |
 
 ---
 
 ## 🖨️ 3D Printing & CAD Mount Files
 
-Where custom brackets and adapters are used, models are designed with **OpenSCAD** and parameterized using the [BOSL2](https://github.com/BelfrySCAD/BOSL2) library:
+Where custom brackets and adapters are used, models are designed with **OpenSCAD** and parameterized using the [BOSL2](https://github.com/BelfrySCAD/BOSL2) library. (Note: `SW07` rests on a 1U 10" printed shelf).
 
-### 1. Network Switch Keyhole Mounts
-
-- **Hardware Target:** Netgear GS108PEv3 / 8-Port Switch chassis.
-- **Reference Model:** `cad/multiboard/sw01-gs108pev3-keyhole-mount.scad` (adapted from Underwear 2.0).
-- **Physical Specs:**
-  - Keyhole center-to-center spacing: 80.0 mm.
-  - Entrance hole diameter: 7.26 mm (tuned to 6.80 mm for print clearance).
-  - Slot neck diameter: 3.86 mm (tuned to 3.50 mm for smooth sliding).
-  - Standoff depth: 2.28 mm (compensates for switch rubber feet).
-- **Generated STLs:**
-  - `sw01-gs108pev3-mount.stl`
-  - `sw01-gs108pev3-foot-standoff.stl`
-
-### 2. Print Settings & Filament Guidelines
+### Print Settings & Filament Guidelines
 
 - **Material:** PETG or ABS/ASA recommended (due to proximity to GPU and hypervisor exhaust thermals). PLA is discouraged for shelf brackets directly adjacent to the GX10.
 - **Infill:** 25%–40% Gyroid for shelves and structural brackets; 100% infill for keystone clips and rail mounting tabs.
@@ -81,16 +68,16 @@ Where custom brackets and adapters are used, models are designed with **OpenSCAD
 
 The entire appliance is engineered to operate comfortably within a standard **North American 120V / 15A household branch circuit** (1,800W continuous max / 1,440W at 80% NEC derating):
 
-| Subsystem                                | Idle Power | Typical Load | Peak Draw  |
-| :--------------------------------------- | :--------- | :----------- | :--------- |
-| **Minisforum Hypervisor (`colt-cp-01`)** | ~12 W      | ~35 W        | ~65 W      |
-| **ASUS Ascent GX10 (`colt-gpu-01`)**     | ~30 W      | ~140 W       | ~220 W     |
-| **8-Port Managed Switch**                | ~6 W       | ~10 W        | ~15 W      |
-| **4TB NVMe SSD Cache**                   | ~1 W       | ~4 W         | ~8 W       |
-| **Total Appliance Draw**                 | **~49 W**  | **~189 W**   | **~308 W** |
+| Subsystem                                   | Idle Power  | Typical Load | Peak Draw  |
+| :------------------------------------------ | :---------- | :----------- | :--------- |
+| **Minisforum Hypervisor (`colt-cp-01`)**    | ~12 W       | ~35 W        | ~65 W      |
+| **ASUS Ascent GX10 (`colt-gpu-01`)**        | ~30 W       | ~140 W       | ~220 W     |
+| **8-Port Managed Switch (`SW07` - GS108E)** | ~1.5 W      | ~2.5 W       | ~4 W       |
+| **4TB NVMe SSD Cache**                      | ~1 W        | ~4 W         | ~8 W       |
+| **Total Appliance Draw**                    | **~44.5 W** | **~181.5 W** | **~297 W** |
 
 > [!NOTE]
-> Under full continuous synthetic LLM inference (vLLM batch execution on Grace Blackwell GB10), total power draw remains under **320 Watts** (~2.7 Amps at 120V). This leaves ample margin for portable generator operation or battery-backed UPS runtimes.
+> Under full continuous synthetic LLM inference (vLLM batch execution on Grace Blackwell GB10), total power draw remains under **300 Watts** (~2.5 Amps at 120V). This leaves ample margin for portable generator operation or battery-backed UPS runtimes.
 
 ---
 
