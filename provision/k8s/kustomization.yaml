@@ -7,4 +7,6 @@ resources:
   - vault/vault-auth-rbac.yaml
   - gitea
   - nvidia/nvidia-device-plugin.yaml
+  - cert-manager/release.yaml
+
 
