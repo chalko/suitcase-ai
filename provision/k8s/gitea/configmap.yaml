@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-inline-config
+  namespace: gitea
+data:
+  app.ini: |
+    APP_NAME = Camp Colt Sovereign Git Forge
+    RUN_USER = git
+    RUN_MODE = prod
+
+    [database]
+    DB_TYPE  = sqlite3
+    PATH     = /data/gitea/gitea.db
+
+    [repository]
+    ROOT = /data/git/repositories
+    DEFAULT_BRANCH = main
+
+    [server]
+    SSH_DOMAIN       = 10.82.0.13
+    DOMAIN           = gitea.colt.internal
+    HTTP_PORT        = 3000
+    ROOT_URL         = http://gitea.colt.internal/
+    DISABLE_SSH      = false
+    SSH_PORT         = 2222
+    SSH_LISTEN_PORT  = 2222
+    START_SSH_SERVER = true
+    LFS_START_SERVER = true
+
+    [security]
+    INSTALL_LOCK   = true
+    SECRET_KEY     = 66c30f781df038cbb2c73335b1d9bf16c878415df84b648bc1bfdb10aee7
+    INTERNAL_TOKEN = eU94QkxEQnFvczR2SjJjVk4yNUt0M2Vub0ZkNW9hR2E=
+
+    [service]
+    DISABLE_REGISTRATION = true
+    ALLOW_ONLY_EXTERNAL_REGISTRATION = false
+    REQUIRE_SIGNIN_VIEW = false
+
+    [lfs]
+    PATH = /data/git/lfs
