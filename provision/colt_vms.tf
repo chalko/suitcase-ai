@@ -17,7 +17,8 @@ resource "proxmox_virtual_environment_vm" "colt_k8s_nodes" {
   }
 
   agent {
-    enabled = false
+    enabled = true
+    trim    = true
   }
 
   network_device {
