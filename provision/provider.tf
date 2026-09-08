@@ -27,6 +27,8 @@ provider "proxmox" {
 }
 
 provider "vault" {
-  address          = "http://10.82.0.5:8200"
+  address          = "https://10.82.0.5:8200"
+  skip_tls_verify  = true
   skip_child_token = true
 }
+
