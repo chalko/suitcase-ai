@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-colt-config
+  namespace: dns
+data:
+  Corefile: |
+    colt.chalko.com:53 {
+        log
+        errors
+        file /etc/coredns/zones/colt.chalko.com.zone colt.chalko.com
+    }
+    .:53 {
+        log
+        errors
+        health :8080
+        ready :8181
+        hosts {
+            10.82.0.2 pve
+            10.82.0.3 colt-gpu-01 haze
+            10.82.0.5 vault
+            10.82.0.10 k8s
+            fallthrough
+        }
+        forward . 10.82.0.1
+        cache 30
+        reload
+    }
+  colt.chalko.com.zone: |
+    $ORIGIN colt.chalko.com.
+    $TTL 60
+    @       IN  SOA ns1.colt.chalko.com. admin.colt.chalko.com. ( 2026090801 7200 3600 1209600 3600 )
+    @       IN  NS  ns1.colt.chalko.com.
+    ns1     IN  A   10.82.50.2
+    dns01   IN  A   10.82.50.2
+    dns02   IN  A   10.82.50.3
+    dns03   IN  A   10.82.50.4
+    ingress IN  A   10.82.50.10
+    pve     IN  A   10.82.0.2
+    colt-gpu-01 IN A 10.82.0.3
+    haze    IN  A   10.82.0.3
+    vault   IN  A   10.82.0.5
+    k8s     IN  A   10.82.0.10
+    *       IN  A   10.82.50.10

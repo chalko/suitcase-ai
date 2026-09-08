@@ -338,6 +338,8 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 10.82.50.10
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
@@ -350,6 +352,7 @@ spec:
   ipFamilies:
   - IPv4
   ipFamilyPolicy: SingleStack
+  loadBalancerIP: 10.82.50.10
   ports:
   - appProtocol: http
     name: http
@@ -365,7 +368,7 @@ spec:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/name: ingress-nginx
-  type: NodePort
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: Service

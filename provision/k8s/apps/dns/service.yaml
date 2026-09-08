@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-colt
+  namespace: dns
+  labels:
+    app: coredns-colt
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 10.82.50.2
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.82.50.2
+  selector:
+    app: coredns-colt
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53

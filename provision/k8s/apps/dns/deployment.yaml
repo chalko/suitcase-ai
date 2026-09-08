@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns-colt
+  namespace: dns
+  labels:
+    app: coredns-colt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coredns-colt
+  template:
+    metadata:
+      labels:
+        app: coredns-colt
+    spec:
+      containers:
+        - name: coredns
+          image: registry.k8s.io/coredns/coredns:v1.14.7
+          imagePullPolicy: IfNotPresent
+          args: ["-conf", "/etc/coredns/Corefile"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/coredns
+              readOnly: true
+            - name: zone-volume
+              mountPath: /etc/coredns/zones
+              readOnly: true
+          ports:
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: config-volume
+          configMap:
+            name: coredns-colt-config
+            items:
+              - key: Corefile
+                path: Corefile
+        - name: zone-volume
+          configMap:
+            name: coredns-colt-config
+            items:
+              - key: colt.chalko.com.zone
+                path: colt.chalko.com.zone

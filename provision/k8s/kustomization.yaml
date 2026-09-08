@@ -3,6 +3,8 @@ kind: Kustomization
 
 resources:
   - storage/local-path-storage.yaml
+  - metallb
+  - apps/dns
   - ingress/ingress-nginx.yaml
   - vault/vault-auth-rbac.yaml
   - gitea
@@ -10,6 +12,4 @@ resources:
   - cert-manager/release.yaml
   - cert-manager/cluster-issuer.yaml
   - apps/inference
-
-
-
+  - apps/litellm

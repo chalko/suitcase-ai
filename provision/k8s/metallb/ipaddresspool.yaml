@@ -1,0 +1,17 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: colt-ingress-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.82.50.2-10.82.50.50
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: colt-l2-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - colt-ingress-pool
