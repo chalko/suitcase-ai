@@ -14,7 +14,6 @@ spec:
             project: colt-chalko
             serviceAccountSecretRef:
               name: clouddns-dns01-solver-secret
-              namespace: cert-manager
               key: service-account.json
 ---
 apiVersion: cert-manager.io/v1
@@ -33,7 +32,6 @@ spec:
             project: colt-chalko
             serviceAccountSecretRef:
               name: clouddns-dns01-solver-secret
-              namespace: cert-manager
               key: service-account.json
 ---
 apiVersion: cert-manager.io/v1
