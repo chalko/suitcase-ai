@@ -1,0 +1,246 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nemotron-49b-haze
+  namespace: nim-system
+  labels:
+    app.kubernetes.io/name: nemotron-49b
+    app.kubernetes.io/component: llm-inference
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nemotron-49b
+  template:
+    metadata:
+      labels:
+        app: nemotron-49b
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        kubernetes.io/hostname: colt-gpu-01
+      runtimeClassName: nvidia
+      hostNetwork: true
+      dnsPolicy: Default
+      imagePullSecrets:
+        - name: ngc-imagepull-secret
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "dedicated"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+      initContainers:
+        # Phase 1A: Pre-flight Dewpoint check, permission verification, and cache sync
+        - name: dewpoint-preflight
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "==> [Phase 1A] Checking NVMe fast cache for Nemotron-49B..."
+              TARGET="/opt/nim/.cache/ngc/hub/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+              SOURCE="/mnt/dewpoint/nims/validated/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+              if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
+                echo "Restoring from Dewpoint validated storage..."
+                mkdir -p /opt/nim/.cache/ngc/hub
+                cp -a "$SOURCE" "$TARGET"
+              fi
+              echo "Syncing filesystem and verifying directory structure..."
+              sync
+              echo "Phase 1A Pre-flight completed."
+          volumeMounts:
+            - name: local-nvme-cache
+              mountPath: /opt/nim/.cache
+            - name: dewpoint-storage
+              mountPath: /mnt/dewpoint
+              readOnly: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+
+        # Phase 1B: Official NVIDIA NIM profile download-to-cache and manifest validation
+        - name: download-model
+          image: nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - download-to-cache
+          args:
+            - --profiles
+            - "f3b4963ec6c3826a2377ea80c1dcd05bef1c6267a9eb67805e3872b8fe2151ae"
+          env:
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ngc-secret
+                  key: NGC_API_KEY
+            - name: NIM_MODEL_NAME
+              value: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+            - name: NIM_CACHE_PATH
+              value: "/opt/nim/.cache"
+          resources:
+            requests:
+              cpu: "4"
+              memory: "8Gi"
+            limits:
+              cpu: "20"
+              memory: "110Gi"
+          volumeMounts:
+            - name: local-nvme-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+
+        # Phase 1C: Flush Linux kernel page cache after hydration to prevent blocking engine startup on UMA
+        - name: cache-flusher
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              echo "==> Flushing Linux kernel page cache after hydration..."
+              sync
+              echo 3 > /proc/sys/vm/drop_caches || true
+              echo "==> Page cache flush complete."
+          volumeMounts:
+            - name: proc
+              mountPath: /proc
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "1"
+              memory: "256Mi"
+
+      # Phase 2: Runtime Inference Engine
+      containers:
+        - name: nemotron-engine
+          image: nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ngc-secret
+                  key: NGC_API_KEY
+            - name: NIM_CACHE_PATH
+              value: "/opt/nim/.cache"
+            - name: NIM_MODEL_NAME
+              value: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+            - name: NIM_SERVER_PORT
+              value: "8001"
+            - name: NIM_HEALTH_PORT
+              value: "8002"
+            - name: NIM_HTTP_API_PORT
+              value: "8001"
+            - name: NIM_GPU_MEMORY_UTILIZATION
+              value: "0.50"
+            - name: NIM_ENABLE_KV_CACHE_REUSE
+              value: "1"
+            - name: NIM_PASSTHROUGH_ARGS
+              value: "--port 8001 --enable-prefix-caching --kv-cache-dtype fp8 --enable-auto-tool-choice --tool-call-parser llama3_json"
+            - name: NIM_MAX_NUM_SEQS
+              value: "64"
+            - name: NIM_MAX_MODEL_LEN
+              value: "32768"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "all"
+          ports:
+            - name: http-api
+              containerPort: 8001
+              protocol: TCP
+            - name: health-api
+              containerPort: 8002
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "8"
+              memory: "32Gi"
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "20"
+              memory: "110Gi"
+              nvidia.com/gpu: "1"
+          volumeMounts:
+            - name: local-nvme-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+          startupProbe:
+            httpGet:
+              path: /v1/health/ready
+              port: 8002
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /v1/health/live
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /v1/health/ready
+              port: 8002
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: local-nvme-cache
+          hostPath:
+            path: /workspace/models/nim-cache
+            type: DirectoryOrCreate
+        - name: dewpoint-storage
+          hostPath:
+            path: /mnt/dewpoint
+            type: DirectoryOrCreate
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+        - name: proc
+          hostPath:
+            path: /proc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nemotron-49b
+  namespace: nim-system
+  labels:
+    app.kubernetes.io/name: nemotron-49b
+    app.kubernetes.io/component: llm-inference
+spec:
+  type: ClusterIP
+  selector:
+    app: nemotron-49b
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8001
+      protocol: TCP
+    - name: health
+      port: 8002
+      targetPort: 8002
+      protocol: TCP
