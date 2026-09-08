@@ -1,15 +1,16 @@
 # Create dedicated cluster secrets for Camp Colt
 resource "talos_machine_secrets" "colt" {
-  talos_version = "v1.9.1"
+  talos_version = "v1.13.10"
 }
 
 # Generate machine configuration for colt-control-01
 data "talos_machine_configuration" "colt_controlplane" {
-  cluster_name     = "camp-colt-k8s"
-  cluster_endpoint = "https://10.82.0.10:6443"
-  machine_type     = "controlplane"
-  machine_secrets  = talos_machine_secrets.colt.machine_secrets
-  talos_version    = "v1.9.1"
+  cluster_name       = "camp-colt-k8s"
+  cluster_endpoint   = "https://10.82.0.10:6443"
+  machine_type       = "controlplane"
+  machine_secrets    = talos_machine_secrets.colt.machine_secrets
+  talos_version      = "v1.13.10"
+  kubernetes_version = "v1.35.8"
 
   config_patches = [
     yamlencode({
@@ -37,11 +38,12 @@ data "talos_machine_configuration" "colt_controlplane" {
 
 # Generate machine configuration for colt-worker-01
 data "talos_machine_configuration" "colt_worker" {
-  cluster_name     = "camp-colt-k8s"
-  cluster_endpoint = "https://10.82.0.10:6443"
-  machine_type     = "worker"
-  machine_secrets  = talos_machine_secrets.colt.machine_secrets
-  talos_version    = "v1.9.1"
+  cluster_name       = "camp-colt-k8s"
+  cluster_endpoint   = "https://10.82.0.10:6443"
+  machine_type       = "worker"
+  machine_secrets    = talos_machine_secrets.colt.machine_secrets
+  talos_version      = "v1.13.10"
+  kubernetes_version = "v1.35.8"
 
   config_patches = [
     yamlencode({
