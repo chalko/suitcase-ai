@@ -49,5 +49,5 @@ resource "proxmox_virtual_environment_vm" "colt_k8s_nodes" {
     type = "l26"
   }
 
-  boot_order = ["ide2", "scsi0"]
+  boot_order = ["scsi0"]
 }

@@ -48,9 +48,9 @@ Dedicated automation token configured with the `Administrator` role on `/`:
 
 Manages native Camp Colt Kubernetes nodes and security infrastructure:
 
-- **`colt-vault`** (CT 9190 @ `10.82.0.5/16`)
-- **`colt-control-01`** (VM 9110 @ `10.82.20.10/16`)
-- **`colt-worker-01`** (VM 9120 @ `10.82.20.13/16`)
+- **`colt-vault`** (CT 9190 @ `10.82.0.5/24`)
+- **`colt-control-01`** (VM 9110 @ `10.82.0.10/24`)
+- **`colt-worker-01`** (VM 9120 @ `10.82.0.13/24`)
 
 Execute plan/apply:
 
