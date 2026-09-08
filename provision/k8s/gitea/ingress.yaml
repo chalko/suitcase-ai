@@ -10,7 +10,22 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "1024m"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - gitea.colt.chalko.com
+        - gitea.colt.internal
+      secretName: colt-chalko-wildcard-tls
   rules:
+    - host: gitea.colt.chalko.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gitea
+                port:
+                  number: 3000
     - host: gitea.colt.internal
       http:
         paths:
