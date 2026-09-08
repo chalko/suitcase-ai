@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 # Source this file: source /home/luna-mayor-agent/luna/rigs/suitcase-ai/scripts/load_colt_env.sh
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+    REPO_ROOT="$(git rev-parse --show-toplevel)"
+elif [ -n "${ZSH_VERSION:-}" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${(%):-%x}")" && pwd)"
+    REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+else
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
+
 
 export VAULT_ADDR="https://10.82.0.5:8200"
 export VAULT_SKIP_VERIFY="true"
