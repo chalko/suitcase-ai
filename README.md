@@ -63,11 +63,12 @@ The cluster is housed in a 3D-printed 10-inch modular rack ([ButterflyRack](http
 
 All virtual infrastructure is provisioned declaratively on `colt-cp-01` via Terraform:
 
-| ID          | Name              | Type           | Allocated Resources          | Network / Endpoint        | Role                                   |   State   |
-| :---------- | :---------------- | :------------- | :--------------------------- | :------------------------ | :------------------------------------- | :-------: |
-| **CT 9190** | `colt-vault`      | Debian 12 LXC  | 1 vCPU, 1GB RAM, 8GB disk    | `http://10.82.0.5:8200`   | HashiCorp Vault 2.1 (SSH CA & PKI)     | 🟢 Active |
-| **VM 9110** | `colt-control-01` | Talos Linux VM | 2 vCPU, 2.5GB RAM, 30GB NVMe | `https://10.82.0.10:6443` | `camp-colt-k8s` Control Plane          | 🟢 Active |
-| **VM 9120** | `colt-worker-01`  | Talos Linux VM | 4 vCPU, 6GB RAM, 100GB NVMe  | `10.82.0.13`              | Workload execution & Ingress DaemonSet | 🟢 Active |
+| ID            | Name              | Type           | Allocated Resources          | Network / Endpoint        | Role                                   |   State   |
+| :------------ | :---------------- | :------------- | :--------------------------- | :------------------------ | :------------------------------------- | :-------: |
+| **CT 9190**   | `colt-vault`      | Debian 12 LXC  | 1 vCPU, 1GB RAM, 8GB disk    | `http://10.82.0.5:8200`   | HashiCorp Vault 2.1 (SSH CA & PKI)     | 🟢 Active |
+| **VM 9110**   | `colt-control-01` | Talos Linux VM | 2 vCPU, 2.5GB RAM, 30GB NVMe | `https://10.82.0.10:6443` | `camp-colt-k8s` Control Plane          | 🟢 Active |
+| **VM 9120**   | `colt-worker-01`  | Talos Linux VM | 4 vCPU, 6GB RAM, 100GB NVMe  | `10.82.0.13`              | Workload execution & Ingress DaemonSet | 🟢 Active |
+| **Baremetal** | `colt-gpu-01`     | DGX OS Arm64   | 20 CPU, 128GB Unified, GB10  | `10.82.0.3`               | `camp-colt-k8s` Heterogeneous GPU Node | 🟢 Active |
 
 ---
 
