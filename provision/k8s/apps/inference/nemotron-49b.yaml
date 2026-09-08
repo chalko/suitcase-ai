@@ -147,11 +147,11 @@ spec:
             - name: PYTHONUNBUFFERED
               value: "1"
             - name: NIM_SERVER_PORT
+              value: "8000"
+            - name: NIM_BACKEND_PORT
               value: "8001"
             - name: NIM_HEALTH_PORT
               value: "8002"
-            - name: NIM_HTTP_API_PORT
-              value: "8001"
             - name: NIM_GPU_MEMORY_UTILIZATION
               value: "0.50"
             - name: NIM_ENABLE_KV_CACHE_REUSE
@@ -168,7 +168,7 @@ spec:
               value: "all"
           ports:
             - name: http-api
-              containerPort: 8001
+              containerPort: 8000
               protocol: TCP
             - name: health-api
               containerPort: 8002
@@ -243,7 +243,7 @@ spec:
   ports:
     - name: http
       port: 8000
-      targetPort: 8001
+      targetPort: 8000
       protocol: TCP
     - name: health
       port: 8002
