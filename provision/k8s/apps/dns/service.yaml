@@ -5,8 +5,6 @@ metadata:
   namespace: dns
   labels:
     app: coredns-colt
-  annotations:
-    metallb.universe.tf/loadBalancerIPs: 10.82.50.2
 spec:
   type: LoadBalancer
   loadBalancerIP: 10.82.50.2
