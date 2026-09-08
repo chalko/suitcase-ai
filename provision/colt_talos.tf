@@ -10,7 +10,7 @@ data "talos_machine_configuration" "colt_controlplane" {
   machine_type       = "controlplane"
   machine_secrets    = talos_machine_secrets.colt.machine_secrets
   talos_version      = "v1.14.0"
-  kubernetes_version = "v1.35.8"
+  kubernetes_version = "v1.36.4"
 
   config_patches = [
     yamlencode({
@@ -43,7 +43,7 @@ data "talos_machine_configuration" "colt_worker" {
   machine_type       = "worker"
   machine_secrets    = talos_machine_secrets.colt.machine_secrets
   talos_version      = "v1.14.0"
-  kubernetes_version = "v1.35.8"
+  kubernetes_version = "v1.36.4"
 
   config_patches = [
     yamlencode({
