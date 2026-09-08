@@ -4,7 +4,8 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-export VAULT_ADDR="http://10.82.0.5:8200"
+export VAULT_ADDR="https://10.82.0.5:8200"
+export VAULT_SKIP_VERIFY="true"
 export PROXMOX_VE_ENDPOINT="https://10.82.0.2:8006/"
 export PROXMOX_VE_INSECURE="true"
 
