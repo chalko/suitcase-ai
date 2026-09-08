@@ -69,7 +69,25 @@ All virtual infrastructure is provisioned declaratively on `colt-cp-01` via Terr
 | **VM 9110**   | `colt-control-01` | Talos Linux VM | 2 vCPU, 2.5GB RAM, 30GB NVMe | `https://10.82.0.10:6443` | `camp-colt-k8s` Control Plane (v1.36.4) | 🟢 Active |
 | **VM 9120**   | `colt-worker-01`  | Talos Linux VM | 4 vCPU, 6GB RAM, 100GB NVMe  | `10.82.0.13`              | Workload execution & Ingress (v1.36.4)  | 🟢 Active |
 | **Baremetal** | `colt-gpu-01`     | DGX OS Arm64   | 20 CPU, 128GB Unified, GB10  | `10.82.0.3`               | `camp-colt-k8s` GPU Node (v1.36.4)      | 🟢 Active |
-| **K8s Pod**   | `gitea`           | K8s Deployment | 1 vCPU, 1GB RAM, 20GB NVMe   | `http://10.82.0.13/colt`  | Sovereign In-Cluster Git Forge          | 🟢 Active |
+
+---
+
+## 🔄 Sovereign GitOps Delivery (Flux CD & In-Cluster Gitea)
+
+Cluster workloads, platform controllers, and ingress configurations are continuously reconciled via **Flux CD** pulling directly from the sovereign, in-cluster **Gitea** Git forge:
+
+| Workload / Service  | Type              | Delivery Engine  | Endpoint / Access                  | Role & Storage                                    |   State   |
+| :------------------ | :---------------- | :--------------- | :--------------------------------- | :------------------------------------------------ | :-------: |
+| **`gitea`**         | K8s Deployment    | GitOps (Flux CD) | `http://10.82.0.13/colt` (`:3000`) | Sovereign Git Forge (20GB NVMe `local-path`)      | 🟢 Active |
+| **`flux-system`**   | GitOps Controller | Self-Managed     | In-Cluster (`flux-system`)         | Continuous reconciliation of `clusters/camp-colt` | 🟢 Active |
+| **`ingress-nginx`** | K8s DaemonSet     | GitOps (Flux CD) | `10.82.0.13` (Ports 80/443)        | Edge ingress pinned to `talos-64r-bft` worker     | 🟢 Active |
+
+### Key GitOps Elements
+
+- **Forge URL:** `http://10.82.0.13/colt/suitcase-ai.git` (in-cluster: `http://gitea.gitea.svc.cluster.local:3000/colt/suitcase-ai.git`)
+- **CLI Management:** `tea` CLI configured with default `colt` profile
+- **Source Sync:** `GitRepository/flux-system` polls in-cluster Gitea `main` branch
+- **Root Manifests:** [`clusters/camp-colt/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/clusters/camp-colt/) and [`provision/k8s/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/k8s/)
 
 ---
 
