@@ -142,6 +142,10 @@ spec:
               value: "/opt/nim/.cache"
             - name: NIM_MODEL_NAME
               value: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+            - name: NIM_MODEL_PROFILE
+              value: "f3b4963ec6c3826a2377ea80c1dcd05bef1c6267a9eb67805e3872b8fe2151ae"
+            - name: PYTHONUNBUFFERED
+              value: "1"
             - name: NIM_SERVER_PORT
               value: "8001"
             - name: NIM_HEALTH_PORT
@@ -153,7 +157,7 @@ spec:
             - name: NIM_ENABLE_KV_CACHE_REUSE
               value: "1"
             - name: NIM_PASSTHROUGH_ARGS
-              value: "--port 8001 --enable-prefix-caching --kv-cache-dtype fp8 --enable-auto-tool-choice --tool-call-parser llama3_json"
+              value: "--enable-prefix-caching --kv-cache-dtype fp8 --enable-auto-tool-choice --tool-call-parser llama3_json"
             - name: NIM_MAX_NUM_SEQS
               value: "64"
             - name: NIM_MAX_MODEL_LEN
@@ -187,10 +191,10 @@ spec:
             httpGet:
               path: /v1/health/ready
               port: 8002
-            initialDelaySeconds: 20
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 60
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 120
           livenessProbe:
             httpGet:
               path: /v1/health/live
