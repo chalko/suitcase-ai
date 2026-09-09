@@ -60,7 +60,18 @@ spec:
               while [ ! -S /var/run/docker.sock ]; do
                 sleep 1
               done
-              echo "Docker socket ready. Starting act_runner daemon..."
+              echo "Docker socket ready."
+              cd /data
+              if [ ! -s /data/.runner ]; then
+                echo "Registering runner with Gitea..."
+                act_runner register --no-interactive \
+                  --instance "${GITEA_INSTANCE_URL}" \
+                  --token "${GITEA_RUNNER_REGISTRATION_TOKEN}" \
+                  --name "${GITEA_RUNNER_NAME}" \
+                  --labels "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04,ubuntu-22.04:docker://catthehacker/ubuntu:act-22.04" \
+                  --config /config/config.yaml
+              fi
+              echo "Starting act_runner daemon..."
               exec act_runner daemon --config /config/config.yaml
           env:
             - name: GITEA_INSTANCE_URL
