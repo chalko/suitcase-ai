@@ -48,11 +48,12 @@ spec:
               echo "==> [Phase 1A] Checking NVMe fast cache for Nemotron-49B..."
               TARGET="/opt/nim/.cache/ngc/hub/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
               SOURCE="/mnt/model-depot/nims/validated/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+              mkdir -p /opt/nim/.cache/ngc/hub
               if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
                 echo "Restoring from ModelDepot validated storage..."
-                mkdir -p /opt/nim/.cache/ngc/hub
                 cp -a "$SOURCE" "$TARGET"
               fi
+              chmod -R 777 /opt/nim/.cache || true
               echo "Syncing filesystem and verifying directory structure..."
               sync
               echo "Phase 1A Pre-flight completed."
