@@ -12,3 +12,4 @@ resources:
   - pvc-grafana.yaml
   - deployment-grafana.yaml
   - ingress-grafana.yaml
+  - deployment-proxmox-exporter.yaml

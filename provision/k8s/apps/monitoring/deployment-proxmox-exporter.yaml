@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxmox-exporter
+  namespace: monitoring
+  labels:
+    app: proxmox-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxmox-exporter
+  template:
+    metadata:
+      labels:
+        app: proxmox-exporter
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: talos-64r-bft
+      containers:
+        - name: pve-exporter
+          image: prompve/prometheus-pve-exporter:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--config.file=/etc/pve/pve.yml"
+          ports:
+            - name: metrics
+              containerPort: 9221
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/pve
+              readOnly: true
+      volumes:
+        - name: config
+          secret:
+            secretName: proxmox-exporter-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox-exporter
+  namespace: monitoring
+  labels:
+    app: proxmox-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: proxmox-exporter
+  ports:
+    - name: metrics
+      port: 9221
+      targetPort: 9221

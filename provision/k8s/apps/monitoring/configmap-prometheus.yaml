@@ -34,6 +34,17 @@ data:
             labels:
               app: 'ollama'
 
+      - job_name: 'proxmox'
+        metrics_path: '/pve'
+        params:
+          target: ['10.82.0.2']
+        static_configs:
+          - targets: ['proxmox-exporter.monitoring.svc.cluster.local:9221']
+            labels:
+              instance: '10.82.0.2'
+              node: 'colt-cp-01'
+              app: 'proxmox'
+
       - job_name: 'kubernetes-nodes'
         scheme: https
         tls_config:
