@@ -8,7 +8,7 @@ spec:
   interval: 1m0s
   ref:
     branch: main
-  url: http://gitea.gitea.svc.cluster.local:3000/colt/suitcase-ai.git
+  url: https://gitea.colt.chalko.com/colt/suitcase-ai.git
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
