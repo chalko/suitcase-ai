@@ -4,3 +4,16 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - nemotron-49b.yaml
+
+patches:
+  - path: mixins/gb10-affinity.yaml
+    target:
+      kind: Deployment
+  - path: mixins/model-depot-cache.yaml
+    target:
+      kind: Deployment
+  - path: mixins/nim-engine-base.yaml
+    target:
+      kind: Deployment
+      name: nemotron-49b-haze
+
