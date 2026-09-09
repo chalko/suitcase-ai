@@ -1,9 +1,145 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inference-base
+  name: nemotron-49b-haze
 spec:
   template:
     spec:
       imagePullSecrets:
         - name: ngc-imagepull-secret
+      initContainers:
+        - name: depot-hydration-preflight
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "==> [Phase 1A] Checking ModelDepot and ReadyLocker cache..."
+              mkdir -p /opt/nim/.cache/ngc/hub /opt/nim/.cache/huggingface/hub
+              if [ -n "${MODEL_DIR:-}" ]; then
+                TARGET="/opt/nim/.cache/ngc/hub/${MODEL_DIR}"
+                SOURCE="/mnt/model-depot/nims/validated/${MODEL_DIR}"
+                if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
+                  echo "Restoring ${MODEL_DIR} from ModelDepot..."
+                  cp -a "$SOURCE" "$TARGET"
+                fi
+              fi
+              chmod -R 777 /opt/nim/.cache || true
+              echo "Syncing filesystem..."
+              sync
+              echo "Phase 1A Pre-flight completed."
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: model-depot-storage
+              mountPath: /mnt/model-depot
+              readOnly: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+        - name: download-model
+          imagePullPolicy: IfNotPresent
+          command:
+            - download-to-cache
+          env:
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ngc-secret
+                  key: NGC_API_KEY
+            - name: NIM_CACHE_PATH
+              value: "/opt/nim/.cache"
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+        - name: cache-flusher
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "==> Flushing Linux kernel page cache after hydration..."
+              sync
+              echo 3 > /proc/sys/vm/drop_caches || true
+              echo "==> Page cache flush complete."
+          volumeMounts:
+            - name: proc
+              mountPath: /proc
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "1"
+              memory: "256Mi"
+      containers:
+        - name: nemotron-engine
+          ports:
+            - name: http-api
+              containerPort: 8000
+              protocol: TCP
+            - name: health-api
+              containerPort: 8002
+              protocol: TCP
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+          env:
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ngc-secret
+                  key: NGC_API_KEY
+            - name: NIM_CACHE_PATH
+              value: "/opt/nim/.cache"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: NIM_SERVER_PORT
+              value: "8000"
+            - name: NIM_BACKEND_PORT
+              value: "8001"
+            - name: NIM_HEALTH_PORT
+              value: "8002"
+            - name: NIM_ENABLE_KV_CACHE_REUSE
+              value: "1"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "all"
+          startupProbe:
+            httpGet:
+              path: /v1/health/ready
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 120
+          livenessProbe:
+            httpGet:
+              path: /v1/health/live
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /v1/health/ready
+              port: 8002
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
