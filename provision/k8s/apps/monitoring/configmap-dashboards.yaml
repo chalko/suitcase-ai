@@ -136,10 +136,9 @@ data:
     \ Proxy Router Dashboard\",\n  \"uid\": \"litellm-proxy-overview\"\n}\n"
   executive-dashboard.json: "{\n  \"annotations\": {\n    \"list\": []\n  },\n  \"\
     editable\": true,\n  \"fiscalYearStartMonth\": 0,\n  \"graphTooltip\": 1,\n  \"\
-    id\": null,\n  \"links\": [],\n  \"liveNow\": false,\n  \"layout\": {\n    \"\
-    type\": \"auto\",\n    \"fillScreen\": true\n  },\n  \"panels\": [\n    {\n  \
-    \    \"collapsed\": false,\n      \"gridPos\": {\n        \"h\": 1,\n        \"\
-    w\": 24,\n        \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 100,\n\
+    id\": null,\n  \"links\": [],\n  \"liveNow\": false,\n  \"panels\": [\n    {\n\
+    \      \"collapsed\": false,\n      \"gridPos\": {\n        \"h\": 1,\n      \
+    \  \"w\": 24,\n        \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 100,\n\
     \      \"title\": \"Executive KPI Summary (Multi-LLM Fleet)\",\n      \"type\"\
     : \"row\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n      \"fieldConfig\"\
     : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"\
@@ -489,7 +488,7 @@ data:
     ,\n  \"schemaVersion\": 38,\n  \"style\": \"dark\",\n  \"tags\": [\n    \"executive\"\
     ,\n    \"scai\",\n    \"sovereign\",\n    \"overview\"\n  ],\n  \"time\": {\n\
     \    \"from\": \"now-1h\",\n    \"to\": \"now\"\n  },\n  \"title\": \"Executive\
-    \ Pilot Combo Dashboard\",\n  \"uid\": \"executive-pilot-overview\"\n}\n"
+    \ Pilot Combo Dashboard\",\n  \"uid\": \"executive-pilot-overview\"\n}"
   haze-dashboard.json: "{\n  \"annotations\": {\n    \"list\": []\n  },\n  \"editable\"\
     : true,\n  \"fiscalYearStartMonth\": 0,\n  \"graphTooltip\": 0,\n  \"id\": null,\n\
     \  \"links\": [],\n  \"liveNow\": false,\n  \"panels\": [\n    {\n      \"collapsed\"\
