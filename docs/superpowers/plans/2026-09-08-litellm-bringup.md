@@ -8,7 +8,7 @@
 
 **Tech Stack:** Kubernetes v1.36.4, Talos Linux v1.14.0, LiteLLM (`ghcr.io/berriai/litellm:main-latest`), PostgreSQL 16 Alpine, HashiCorp Vault, Ingress-NGINX, Flux GitOps.
 
-**Spec:** Fog LiteLLM reference (`https://gitea.fog.chalko.com/Chalko/fog/src/branch/main/apps/base/litellm/`), `AGENTS.md` (Least Privilege & Zero Secret).
+**Spec:** Fog LiteLLM reference (`https://github.com/BerriAI/litellm`), `AGENTS.md` (Least Privilege & Zero Secret).
 
 ## Global Constraints
 

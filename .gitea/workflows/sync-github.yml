@@ -1,0 +1,32 @@
+name: Sync Public Branch to GitHub
+
+on:
+  push:
+    branches:
+      - public
+
+jobs:
+  sync-to-github:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Public Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: public
+
+      - name: Run Zero-Plaintext Security Preflight
+        run: |
+          chmod +x ./scripts/preflight-public-scan.sh
+          ./scripts/preflight-public-scan.sh
+
+      - name: Push to GitHub Main
+        env:
+          GITHUB_DEPLOY_KEY: ${{ secrets.GITHUB_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$GITHUB_DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+          git remote add github git@github.com:chalko/suitcase-ai.git || true
+          git push -u github public:main --tags
