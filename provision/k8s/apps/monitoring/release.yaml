@@ -51,11 +51,13 @@ spec:
         kubernetes.io/arch: amd64
     prometheus:
       prometheusSpec:
-        securityContext:
-          runAsUser: 0
-          runAsNonRoot: false
         nodeSelector:
           kubernetes.io/arch: amd64
+        securityContext:
+          fsGroup: 65534
+          runAsGroup: 65534
+          runAsNonRoot: true
+          runAsUser: 65534
         storageSpec:
           volumeClaimTemplate:
             spec:
