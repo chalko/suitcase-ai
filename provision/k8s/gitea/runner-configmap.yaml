@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-runner-config
+  namespace: gitea
+data:
+  config.yaml: |
+    runner:
+      file: .runner
+      capacity: 2
+      timeout: 3h
+      shutdown_timeout: 0s
+      fetch_timeout: 5s
+      fetch_interval: 2s
+      labels:
+        - "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
+        - "ubuntu-22.04:docker://catthehacker/ubuntu:act-22.04"
+    cache:
+      enabled: true
+    container:
+      network: "host"
+      privileged: false

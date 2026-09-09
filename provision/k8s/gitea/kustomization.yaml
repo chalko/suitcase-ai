@@ -8,3 +8,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - runner-configmap.yaml
+  - runner.yaml
