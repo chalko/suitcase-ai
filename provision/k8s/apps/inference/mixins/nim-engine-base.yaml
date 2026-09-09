@@ -85,6 +85,7 @@ spec:
               memory: "256Mi"
       containers:
         - name: nemotron-engine
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http-api
               containerPort: 8000
