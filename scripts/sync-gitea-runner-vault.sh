@@ -8,6 +8,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+export KUBECONFIG="${KUBECONFIG:-$REPO_ROOT/colt-kubeconfig}"
 export VAULT_ADDR="${VAULT_ADDR:-https://10.82.0.5:8200}"
 export VAULT_SKIP_VERIFY="${VAULT_SKIP_VERIFY:-true}"
 export VAULT_CLIENT_CERT="${VAULT_CLIENT_CERT:-$REPO_ROOT/agent-keys/agents/colt-sysadmin/colt-sysadmin_tls.crt}"
