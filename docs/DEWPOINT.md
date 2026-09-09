@@ -1,5 +1,8 @@
 # Dewpoint Storage Architecture & Model Lifecycle Runbook
 
+> [!WARNING] **DEPRECATED**: The "Dewpoint" storage doctrine and naming convention is superseded by the [Storage Logistics Doctrine: ModelDepot & ReadyLocker](storage_tiering_model_depot_ready_locker.md).
+> All new configurations and manifests must use `ModelDepot` (`/mnt/model-depot`) and `ReadyLocker` (`/workspace/models/fast-cache`).
+
 ## 1. Architectural Overview
 
 **Dewpoint** (`/mnt/dewpoint`) is the persistent, high-capacity **4 TB Btrfs storage pool** (`/dev/sda`) hosted on the **Camp Colt GPU accelerator node** (`colt-gpu-01` @ `10.82.0.3`, ASUS Ascent GX10 / NVIDIA Grace Blackwell GB10).

@@ -20,7 +20,8 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: arm64
-        kubernetes.io/hostname: colt-gpu-01
+        accelerator: gb10
+        nvidia.com/gpu.present: "true"
       runtimeClassName: nvidia
       hostNetwork: true
       dnsPolicy: Default
@@ -35,8 +36,8 @@ spec:
           value: "gpu"
           effect: "NoSchedule"
       initContainers:
-        # Phase 1A: Pre-flight Dewpoint check, permission verification, and cache sync
-        - name: dewpoint-preflight
+        # Phase 1A: Pre-flight ModelDepot check, permission verification, and cache sync
+        - name: depot-hydration-preflight
           image: docker.io/library/busybox:1.36
           imagePullPolicy: IfNotPresent
           command:
@@ -46,9 +47,9 @@ spec:
               set -eu
               echo "==> [Phase 1A] Checking NVMe fast cache for Nemotron-49B..."
               TARGET="/opt/nim/.cache/ngc/hub/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
-              SOURCE="/mnt/dewpoint/nims/validated/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+              SOURCE="/mnt/model-depot/nims/validated/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
               if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
-                echo "Restoring from Dewpoint validated storage..."
+                echo "Restoring from ModelDepot validated storage..."
                 mkdir -p /opt/nim/.cache/ngc/hub
                 cp -a "$SOURCE" "$TARGET"
               fi
@@ -56,10 +57,10 @@ spec:
               sync
               echo "Phase 1A Pre-flight completed."
           volumeMounts:
-            - name: local-nvme-cache
+            - name: local-ready-cache
               mountPath: /opt/nim/.cache
-            - name: dewpoint-storage
-              mountPath: /mnt/dewpoint
+            - name: model-depot-storage
+              mountPath: /mnt/model-depot
               readOnly: true
           resources:
             requests:
@@ -97,7 +98,7 @@ spec:
               cpu: "20"
               memory: "110Gi"
           volumeMounts:
-            - name: local-nvme-cache
+            - name: local-ready-cache
               mountPath: /opt/nim/.cache
             - name: dshm
               mountPath: /dev/shm
@@ -183,7 +184,7 @@ spec:
               memory: "110Gi"
               nvidia.com/gpu: "1"
           volumeMounts:
-            - name: local-nvme-cache
+            - name: local-ready-cache
               mountPath: /opt/nim/.cache
             - name: dshm
               mountPath: /dev/shm
@@ -212,13 +213,13 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
       volumes:
-        - name: local-nvme-cache
+        - name: local-ready-cache
           hostPath:
-            path: /workspace/models/nim-cache
+            path: /workspace/models/fast-cache
             type: DirectoryOrCreate
-        - name: dewpoint-storage
+        - name: model-depot-storage
           hostPath:
-            path: /mnt/dewpoint
+            path: /mnt/model-depot
             type: DirectoryOrCreate
         - name: dshm
           emptyDir:
