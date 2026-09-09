@@ -23,6 +23,8 @@ within the Suitcase AI initiative.
    - **Infrastructure as Code (IaC):** Use **Terraform** (`terraform plan`,
      `terraform apply`) for managing Proxmox VE hypervisors and Talos Linux
      nodes.
+   - **GitOps for Kubernetes:** Always use **Flux** (`flux reconcile kustomization <name> --with-source`)
+     for managing Kubernetes workloads and cluster state from `colt/main`.
    - **Configuration Management:** Use **Ansible**
      (`provision/ansible/inventory/hosts.yaml`) with OpenSSH CA certificate
      authentication.
@@ -45,7 +47,13 @@ within the Suitcase AI initiative.
      strictly segregated at the resource boundary on VLAN 613; in-guest OS configurations
      are managed externally.
 
-4. **Verification Before Assertion:**
-   - Always run pre-flight syntax checks, dry-run plans (`terraform plan`), and
-     network verifications before committing changes or declaring milestones
-     complete.
+4. **Verification & Live Validation Before Task Completion:**
+
+   - **GitOps Reconciliation & Health Checks:** Always ensure Flux updates are complete
+     and pods/jobs are verified healthy and ready before marking tasks complete or closing beads.
+   - **Mandatory Inference Prompt Verification:** If a change modifies or affects inference
+     workloads, engines, storage tiers, or routing, you MUST dispatch a live sample prompt
+     to the inference endpoint (e.g. `/v1/chat/completions`) and verify valid model output
+     before declaring the task complete.
+   - **Pre-flight Checks:** Always run pre-flight syntax checks, dry-run plans (`terraform plan`,
+     `kubectl --dry-run=client`), and network verifications before committing changes.
