@@ -51,13 +51,9 @@ spec:
         kubernetes.io/arch: amd64
     prometheus:
       prometheusSpec:
-        initChownData:
-          enabled: true
         securityContext:
-          fsGroup: 65534
-          runAsGroup: 65534
-          runAsNonRoot: true
-          runAsUser: 65534
+          runAsUser: 0
+          runAsNonRoot: false
         nodeSelector:
           kubernetes.io/arch: amd64
         storageSpec:
