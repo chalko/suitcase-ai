@@ -120,6 +120,15 @@ spec:
               value: "all"
             - name: NVIDIA_DRIVER_CAPABILITIES
               value: "all"
+          resources:
+            requests:
+              cpu: "8"
+              memory: "32Gi"
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "20"
+              memory: "110Gi"
+              nvidia.com/gpu: "1"
           startupProbe:
             httpGet:
               path: /v1/health/ready

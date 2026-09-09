@@ -32,19 +32,16 @@ spec:
         app: nemotron-49b
     spec:
       initContainers:
-        # Phase 1A: Target model cache directory
         - name: depot-hydration-preflight
           envFrom:
             - configMapRef:
                 name: nemotron-49b-config
-        # Phase 1B: Model profile download & validation
         - name: download-model
           image: nim-model-image
           args: ["--use-cache", "--profiles", "$(NIM_MODEL_PROFILE)"]
           envFrom:
             - configMapRef:
                 name: nemotron-49b-config
-      # Phase 2: Runtime Inference Engine
       containers:
         - name: nemotron-engine
           image: nim-model-image
@@ -60,15 +57,6 @@ spec:
               value: "64"
             - name: NIM_MAX_MODEL_LEN
               value: "32768"
-          resources:
-            requests:
-              cpu: "8"
-              memory: "32Gi"
-              nvidia.com/gpu: "1"
-            limits:
-              cpu: "20"
-              memory: "110Gi"
-              nvidia.com/gpu: "1"
 ---
 apiVersion: v1
 kind: Service
