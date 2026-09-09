@@ -1,0 +1,105 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: llama-benchy-nemotron-49b
+  namespace: nim-system
+  labels:
+    app.kubernetes.io/name: llama-benchy
+    app.kubernetes.io/component: inference-benchmark
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: llama-benchy
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+      containers:
+        - name: benchy
+          image: docker.io/library/python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -euo pipefail
+              echo "======================================================================"
+              echo " [Spark Arena] Starting llama-benchy Benchmark Suite on GX10"
+              echo "======================================================================"
+              pip install --no-cache-dir requests urllib3 tabulate
+
+              python3 - << 'PYEOF'
+              import time
+              import json
+              import csv
+              import requests
+
+              ENDPOINT = "http://nemotron-49b.nim-system.svc.cluster.local:8000/v1/chat/completions"
+              HEALTH_ENDPOINT = "http://nemotron-49b.nim-system.svc.cluster.local:8002/v1/health/ready"
+              MODEL = "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+
+              print(f"[*] Checking health endpoint: {HEALTH_ENDPOINT}")
+              for attempt in range(30):
+                  try:
+                      r = requests.get(HEALTH_ENDPOINT, timeout=3)
+                      if r.status_code == 200:
+                          print("[+] Model endpoint is healthy and ready.")
+                          break
+                  except Exception as e:
+                      pass
+                  time.sleep(2)
+              else:
+                  print("[-] Warning: Health probe timeout, proceeding with benchmark...")
+
+              payload = {
+                  "model": MODEL,
+                  "messages": [{"role": "user", "content": "Explain the architecture of NVFP4 quantization on Grace Blackwell in 3 concise bullet points."}],
+                  "max_tokens": 128,
+                  "temperature": 0.2
+              }
+
+              print(f"[*] Dispatching benchmark request to {ENDPOINT}...")
+              start_time = time.time()
+              response = requests.post(ENDPOINT, json=payload, timeout=60)
+              latency = time.time() - start_time
+
+              if response.status_code == 200:
+                  data = response.json()
+                  content = data["choices"][0]["message"]["content"]
+                  usage = data.get("usage", {})
+                  prompt_tokens = usage.get("prompt_tokens", 0)
+                  completion_tokens = usage.get("completion_tokens", 0)
+                  tok_per_sec = completion_tokens / latency if latency > 0 else 0
+
+                  print("\n======================================================================")
+                  print(" [Response Output]")
+                  print("======================================================================")
+                  print(content)
+                  print("======================================================================")
+                  print(f"Latency: {latency:.2f}s | Completion Tokens: {completion_tokens} | TPS: {tok_per_sec:.2f} tok/s")
+
+                  # Export results.csv
+                  with open("/tmp/results.csv", "w", newline="") as f:
+                      writer = csv.writer(f)
+                      writer.writerow(["model", "latency_sec", "prompt_tokens", "completion_tokens", "tps"])
+                      writer.writerow([MODEL, f"{latency:.2f}", prompt_tokens, completion_tokens, f"{tok_per_sec:.2f}"])
+                  print("[+] Benchmark results saved to /tmp/results.csv")
+              else:
+                  print(f"[-] Error: Benchmark request failed with status {response.status_code}: {response.text}")
+                  exit(1)
+              PYEOF
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
