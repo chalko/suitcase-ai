@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: harbor-core
+  namespace: harbor
+  labels:
+    app.kubernetes.io/name: harbor
+    app.kubernetes.io/component: core
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: harbor
+      app.kubernetes.io/component: core
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: harbor
+        app.kubernetes.io/component: core
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: core
+          image: goharbor/harbor-core:v2.11.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: EXT_ENDPOINT
+              value: "https://harbor.colt.chalko.com"
+            - name: CORE_URL
+              value: "http://harbor-core:8080"
+            - name: REGISTRY_URL
+              value: "http://harbor-registry:5000"
+            - name: REGISTRY_CONTROLLER_URL
+              value: "http://harbor-registryctl:8080"
+            - name: DATABASE_TYPE
+              value: "postgresql"
+            - name: POSTGRESQL_HOST
+              value: "harbor-database"
+            - name: POSTGRESQL_PORT
+              value: "5432"
+            - name: POSTGRESQL_DATABASE
+              value: "registry"
+            - name: POSTGRESQL_USERNAME
+              value: "postgres"
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-secret
+                  key: POSTGRESQL_PASSWORD
+            - name: POSTGRESQL_SSLMODE
+              value: "disable"
+            - name: CACHE_TYPE
+              value: "redis"
+            - name: REDIS_HOST
+              value: "harbor-redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_TYPE
+              value: "standalone"
+            - name: REDIS_URL_CORE
+              value: "redis://harbor-redis:6379/0"
+            - name: _REDIS_URL_CORE
+              value: "redis://harbor-redis:6379/0"
+            - name: _REDIS_URL_REG
+              value: "redis://harbor-redis:6379/1"
+            - name: _REDIS_URL_JOB
+              value: "redis://harbor-redis:6379/2"
+            - name: JOBSERVICE_URL
+              value: "http://harbor-jobservice:8080"
+            - name: PORTAL_URL
+              value: "http://harbor-portal:8080"
+            - name: TOKEN_PRIVATE_KEY_PATH
+              value: "/etc/core/private_key.pem"
+            - name: HARBOR_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-secret
+                  key: HARBOR_ADMIN_PASSWORD
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-secret
+                  key: SECRET_KEY
+            - name: CORE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-secret
+                  key: CORE_SECRET
+            - name: JOBSERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-secret
+                  key: JOBSERVICE_SECRET
+            - name: REGISTRY_CREDENTIAL_USERNAME
+              value: "admin"
+            - name: REGISTRY_CREDENTIAL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-secret
+                  key: HARBOR_ADMIN_PASSWORD
+            - name: CONFIG_PATH
+              value: "/etc/core/app.conf"
+            - name: PERMITTED_REGISTRY_TYPES
+              value: '["harbor","docker-hub","docker-registry","aws-ecr","google-gcr","azure-acr","ali-acr","jfrog-artifactory","huawei-SWR"]'
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: core-config
+              mountPath: /etc/core/app.conf
+              subPath: app.conf
+            - name: token-private-key
+              mountPath: /etc/core/private_key.pem
+              subPath: private_key.pem
+            - name: token-cert
+              mountPath: /etc/core/certificates/root.crt
+              subPath: root.crt
+            - name: core-data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /api/v2.0/ping
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /api/v2.0/ping
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 3
+      volumes:
+        - name: core-config
+          configMap:
+            name: harbor-core-config
+        - name: token-private-key
+          secret:
+            secretName: harbor-secret
+            items:
+              - key: private_key.pem
+                path: private_key.pem
+        - name: token-cert
+          secret:
+            secretName: harbor-secret
+            items:
+              - key: root.crt
+                path: root.crt
+        - name: core-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: harbor-core
+  namespace: harbor
+  labels:
+    app.kubernetes.io/name: harbor
+    app.kubernetes.io/component: core
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: core
+      port: 8080
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: harbor
+    app.kubernetes.io/component: core

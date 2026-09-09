@@ -11,6 +11,7 @@ resources:
   - nvidia/nvidia-device-plugin.yaml
   - cert-manager/release.yaml
   - cert-manager/cluster-issuer.yaml
+  - harbor
   - apps/inference
   - apps/litellm
   - apps/open-webui
