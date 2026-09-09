@@ -16,3 +16,4 @@ resources:
   - apps/open-webui
   - apps/ollama
   - apps/monitoring
+  - apps/olah

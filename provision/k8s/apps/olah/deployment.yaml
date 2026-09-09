@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: olah
+  namespace: model-cache
+  labels:
+    app: olah
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: olah
+  template:
+    metadata:
+      labels:
+        app: olah
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: olah
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -euo pipefail
+              pip install --no-cache-dir olah
+              exec olah-cli \
+                --repos-path /data/cache \
+                --cache-size-limit 15GB \
+                --cache-clean-strategy LRU \
+                --port 8090 \
+                --host 0.0.0.0 \
+                --mirror-scheme https \
+                --mirror-netloc olah.colt.chalko.com
+          ports:
+            - containerPort: 8090
+              name: http
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          volumeMounts:
+            - name: cache-storage
+              mountPath: /data/cache
+            - name: config-volume
+              mountPath: /etc/olah
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          startupProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+      volumes:
+        - name: cache-storage
+          persistentVolumeClaim:
+            claimName: olah-cache-pvc
+        - name: config-volume
+          configMap:
+            name: olah-config
