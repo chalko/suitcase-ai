@@ -13,3 +13,5 @@ resources:
   - cert-manager/cluster-issuer.yaml
   - apps/inference
   - apps/litellm
+  - apps/open-webui
+  - apps/ollama
