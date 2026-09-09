@@ -1,0 +1,64 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: open-webui
+  namespace: open-webui
+spec:
+  interval: 1h
+  url: https://open-webui.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+  namespace: open-webui
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: open-webui
+      version: "5.26.0"
+      sourceRef:
+        kind: HelmRepository
+        name: open-webui
+        namespace: open-webui
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    image:
+      tag: "0.5.20"
+    ollama:
+      enabled: false
+    pipelines:
+      enabled: false
+    ollamaUrls:
+      - "http://ollama.ollama.svc.cluster.local:11434"
+    openaiBaseApiUrl: "http://litellm.litellm.svc.cluster.local:4000/v1"
+    extraEnvVars:
+      - name: WEBUI_NAME
+        value: "Chalko AI Chat"
+      - name: WEBUI_AUTH
+        value: "true"
+      - name: OPENAI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: open-webui-secrets
+            key: litellm-master-key
+    persistence:
+      enabled: true
+      existingClaim: open-webui-pvc
+    ingress:
+      enabled: true
+      class: nginx
+      ingressClassName: nginx
+      host: chat.colt.chalko.com
+      tls: true
+      existingSecret: colt-chalko-wildcard-tls
+    nodeSelector:
+      kubernetes.io/arch: amd64
