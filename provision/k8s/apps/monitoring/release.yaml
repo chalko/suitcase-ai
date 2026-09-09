@@ -49,15 +49,19 @@ spec:
               - grafana.colt.chalko.com
       nodeSelector:
         kubernetes.io/arch: amd64
+    nodeExporter:
+      enabled: false
     prometheus:
       prometheusSpec:
+        initChownData:
+          enabled: true
+        securityContext:
+          fsGroup: 0
+          runAsGroup: 0
+          runAsNonRoot: false
+          runAsUser: 0
         nodeSelector:
           kubernetes.io/arch: amd64
-        securityContext:
-          fsGroup: 65534
-          runAsGroup: 65534
-          runAsNonRoot: true
-          runAsUser: 65534
         storageSpec:
           volumeClaimTemplate:
             spec:
