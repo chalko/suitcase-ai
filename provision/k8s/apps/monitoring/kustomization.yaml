@@ -3,14 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - rbac.yaml
-  - configmap-prometheus.yaml
-  - pvc-prometheus.yaml
-  - deployment-prometheus.yaml
-  - configmap-datasources.yaml
-  - configmap-dashboards.yaml
+  - release.yaml
   - pvc-grafana.yaml
-  - deployment-grafana.yaml
-  - ingress-grafana.yaml
   - deployment-proxmox-exporter.yaml
   - deployment-dcgm-exporter.yaml

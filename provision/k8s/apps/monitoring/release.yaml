@@ -1,0 +1,72 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: monitoring
+spec:
+  interval: 1h
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "68.4.4"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: monitoring
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    alertmanager:
+      enabled: false
+    grafana:
+      enabled: true
+      persistence:
+        enabled: true
+        existingClaim: grafana-data-pvc
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - grafana.colt.chalko.com
+        tls:
+          - secretName: colt-chalko-wildcard-tls
+            hosts:
+              - grafana.colt.chalko.com
+      nodeSelector:
+        kubernetes.io/arch: amd64
+    prometheus:
+      prometheusSpec:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: local-path
+              resources:
+                requests:
+                  storage: 10Gi
+        additionalScrapeConfigs:
+          - job_name: 'nvidia-dcgm'
+            static_configs:
+              - targets: ['nvidia-dcgm-exporter.monitoring.svc.cluster.local:9400']
+          - job_name: 'proxmox-exporter'
+            static_configs:
+              - targets: ['proxmox-exporter.monitoring.svc.cluster.local:9221']
+    prometheusOperator:
+      nodeSelector:
+        kubernetes.io/arch: amd64
