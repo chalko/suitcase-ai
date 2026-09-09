@@ -33,6 +33,8 @@ spec:
   values:
     alertmanager:
       enabled: false
+    nodeExporter:
+      enabled: false
     grafana:
       enabled: true
       persistence:
@@ -49,19 +51,15 @@ spec:
               - grafana.colt.chalko.com
       nodeSelector:
         kubernetes.io/arch: amd64
-    nodeExporter:
-      enabled: false
     prometheus:
       prometheusSpec:
-        initChownData:
-          enabled: true
-        securityContext:
-          fsGroup: 0
-          runAsGroup: 0
-          runAsNonRoot: false
-          runAsUser: 0
         nodeSelector:
           kubernetes.io/arch: amd64
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          runAsNonRoot: false
+          fsGroup: 0
         storageSpec:
           volumeClaimTemplate:
             spec:
