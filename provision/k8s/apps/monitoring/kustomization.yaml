@@ -13,3 +13,4 @@ resources:
   - deployment-grafana.yaml
   - ingress-grafana.yaml
   - deployment-proxmox-exporter.yaml
+  - deployment-dcgm-exporter.yaml

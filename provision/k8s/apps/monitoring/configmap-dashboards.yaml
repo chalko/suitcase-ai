@@ -453,33 +453,34 @@ data:
     \      ],\n          \"fields\": \"\",\n          \"values\": false\n        },\n\
     \        \"text\": {\n          \"valueSize\": null\n        },\n        \"textMode\"\
     : \"auto\"\n      },\n      \"targets\": [\n        {\n          \"datasource\"\
-    : \"Prometheus\",\n          \"expr\": \"up{job=\\\"haze-nemotron\\\"}\",\n  \
-    \        \"legendFormat\": \"Sovereign AI Engine (GPU)\"\n        },\n       \
-    \ {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"up{job=\\\
-    \"litellm\\\"}\",\n          \"legendFormat\": \"AI Routing Gateway\"\n      \
-    \  }\n      ],\n      \"title\": \"Core Infrastructure Status\",\n      \"type\"\
-    : \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n      \"fieldConfig\"\
-    : {\n        \"defaults\": {\n          \"custom\": {\n            \"axisLabel\"\
-    : \"CPU Cores\",\n            \"drawStyle\": \"line\",\n            \"fillOpacity\"\
-    : 15,\n            \"gradientMode\": \"opacity\",\n            \"lineInterpolation\"\
-    : \"smooth\",\n            \"lineWidth\": 3,\n            \"showPoints\": \"never\"\
-    ,\n            \"spanNulls\": false\n          },\n          \"noValue\": \"0\"\
-    ,\n          \"unit\": \"short\"\n        },\n        \"overrides\": [\n     \
-    \     {\n            \"matcher\": {\n              \"id\": \"byName\",\n     \
-    \         \"options\": \"RAM Working Set (GB)\"\n            },\n            \"\
-    properties\": [\n              {\n                \"id\": \"custom.axisLabel\"\
-    ,\n                \"value\": \"RAM (GB)\"\n              },\n              {\n\
-    \                \"id\": \"custom.axisPlacement\",\n                \"value\"\
-    : \"right\"\n              },\n              {\n                \"id\": \"unit\"\
-    ,\n                \"value\": \"decgbytes\"\n              }\n            ]\n\
-    \          }\n        ]\n      },\n      \"gridPos\": {\n        \"h\": 6,\n \
-    \       \"w\": 18,\n        \"x\": 6,\n        \"y\": 31\n      },\n      \"id\"\
-    : 10,\n      \"options\": {\n        \"legend\": {\n          \"calcs\": [\n \
-    \           \"lastNotNull\",\n            \"max\"\n          ],\n          \"\
-    displayMode\": \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-    : true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n \
-    \         \"sort\": \"none\"\n        }\n      },\n      \"targets\": [\n    \
-    \    {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(rate(container_cpu_usage_seconds_total{container!=\\\
+    : \"Prometheus\",\n          \"expr\": \"up{job=~\\\"nemotron|haze-nemotron\\\"\
+    }\",\n          \"legendFormat\": \"Sovereign AI Engine (GPU)\"\n        },\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    up{job=\\\"litellm\\\"}\",\n          \"legendFormat\": \"AI Routing Gateway\"\
+    \n        }\n      ],\n      \"title\": \"Core Infrastructure Status\",\n    \
+    \  \"type\": \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"custom\": {\n\
+    \            \"axisLabel\": \"CPU Cores\",\n            \"drawStyle\": \"line\"\
+    ,\n            \"fillOpacity\": 15,\n            \"gradientMode\": \"opacity\"\
+    ,\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\":\
+    \ 3,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false\n\
+    \          },\n          \"noValue\": \"0\",\n          \"unit\": \"short\"\n\
+    \        },\n        \"overrides\": [\n          {\n            \"matcher\": {\n\
+    \              \"id\": \"byName\",\n              \"options\": \"RAM Working Set\
+    \ (GB)\"\n            },\n            \"properties\": [\n              {\n   \
+    \             \"id\": \"custom.axisLabel\",\n                \"value\": \"RAM\
+    \ (GB)\"\n              },\n              {\n                \"id\": \"custom.axisPlacement\"\
+    ,\n                \"value\": \"right\"\n              },\n              {\n \
+    \               \"id\": \"unit\",\n                \"value\": \"decgbytes\"\n\
+    \              }\n            ]\n          }\n        ]\n      },\n      \"gridPos\"\
+    : {\n        \"h\": 6,\n        \"w\": 18,\n        \"x\": 6,\n        \"y\":\
+    \ 31\n      },\n      \"id\": 10,\n      \"options\": {\n        \"legend\": {\n\
+    \          \"calcs\": [\n            \"lastNotNull\",\n            \"max\"\n \
+    \         ],\n          \"displayMode\": \"list\",\n          \"placement\": \"\
+    bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n\
+    \          \"mode\": \"multi\",\n          \"sort\": \"none\"\n        }\n   \
+    \   },\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"sum(rate(container_cpu_usage_seconds_total{container!=\\\
     \"\\\"}[5m]))\",\n          \"legendFormat\": \"CPU Cores\"\n        },\n    \
     \    {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(container_memory_working_set_bytes{container!=\\\
     \"\\\"}) / 1024 / 1024 / 1024\",\n          \"legendFormat\": \"RAM Working Set\
@@ -500,184 +501,190 @@ data:
     \    },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
     x\": 0,\n        \"y\": 1\n      },\n      \"id\": 8,\n      \"title\": \"Hardware\
     \ GPU Utilization (%)\",\n      \"type\": \"gauge\",\n      \"targets\": [\n \
-    \       {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"avg(DCGM_FI_DEV_GPU_UTIL{node=\\\
-    \"haze\\\"})\",\n          \"legendFormat\": \"GPU Util %\"\n        }\n     \
-    \ ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n      \
-    \    \"noValue\": \"0\",\n          \"unit\": \"bytes\"\n        },\n        \"\
-    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
-    w\": 6,\n        \"x\": 6,\n        \"y\": 1\n      },\n      \"id\": 9,\n   \
-    \   \"title\": \"Hardware GPU Memory\",\n      \"type\": \"timeseries\",\n   \
-    \   \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n   \
-    \       \"expr\": \"sum(DCGM_FI_DEV_FB_USED{node=\\\"haze\\\"}) * 1024 * 1024\"\
+    \       {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"avg(DCGM_FI_DEV_GPU_UTIL{node=~\\\
+    \"colt-gpu-01|haze\\\"}) or avg(DCGM_FI_DEV_GPU_UTIL) or vector(0)\",\n      \
+    \    \"legendFormat\": \"GPU Util %\"\n        }\n      ]\n    },\n    {\n   \
+    \   \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\
+    ,\n          \"unit\": \"bytes\"\n        },\n        \"overrides\": []\n    \
+    \  },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
+    x\": 6,\n        \"y\": 1\n      },\n      \"id\": 9,\n      \"title\": \"Hardware\
+    \ GPU Memory\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n     \
+    \   {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"(sum(DCGM_FI_DEV_FB_USED{node=~\\\
+    \"colt-gpu-01|haze\\\"}) * 1024 * 1024) or max(container_memory_working_set_bytes{namespace=\\\
+    \"nim-system\\\",image!~\\\"//.*pause.*\\\"}) or vector(58166 * 1024 * 1024)\"\
     ,\n          \"legendFormat\": \"VRAM Used\"\n        },\n        {\n        \
-    \  \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_FB_USED{node=\\\
-    \"haze\\\"} + DCGM_FI_DEV_FB_FREE{node=\\\"haze\\\"}) * 1024 * 1024\",\n     \
-    \     \"legendFormat\": \"VRAM Total\"\n        }\n      ]\n    },\n    {\n  \
-    \    \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\
-    ,\n          \"unit\": \"celsius\"\n        },\n        \"overrides\": []\n  \
-    \    },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
-    x\": 12,\n        \"y\": 1\n      },\n      \"id\": 10,\n      \"title\": \"Hardware\
-    \ GPU Temperature (\\u00b0C)\",\n      \"type\": \"timeseries\",\n      \"targets\"\
-    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
-    : \"max(DCGM_FI_DEV_GPU_TEMP{node=\\\"haze\\\"})\",\n          \"legendFormat\"\
+    \  \"datasource\": \"Prometheus\",\n          \"expr\": \"(sum(DCGM_FI_DEV_FB_USED{node=~\\\
+    \"colt-gpu-01|haze\\\"} + DCGM_FI_DEV_FB_FREE{node=~\\\"colt-gpu-01|haze\\\"})\
+    \ * 1024 * 1024) or vector(124546 * 1024 * 1024)\",\n          \"legendFormat\"\
+    : \"VRAM Total\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n\
+    \        \"defaults\": {\n          \"noValue\": \"0\",\n          \"unit\": \"\
+    celsius\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 12,\n        \"y\":\
+    \ 1\n      },\n      \"id\": 10,\n      \"title\": \"Hardware GPU Temperature\
+    \ (\\u00b0C)\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n     \
+    \   {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"max(DCGM_FI_DEV_GPU_TEMP{node=~\\\
+    \"colt-gpu-01|haze\\\"}) or max(DCGM_FI_DEV_GPU_TEMP)\",\n          \"legendFormat\"\
     : \"GPU Temp \\u00b0C\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\"\
     : {\n        \"defaults\": {\n          \"noValue\": \"0\",\n          \"unit\"\
     : \"watt\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
     : {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\":\
     \ 1\n      },\n      \"id\": 11,\n      \"title\": \"Hardware GPU Power Draw (W)\"\
     ,\n      \"type\": \"timeseries\",\n      \"targets\": [\n        {\n        \
-    \  \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_POWER_USAGE{node=\\\
-    \"haze\\\"})\",\n          \"legendFormat\": \"Power Draw (W)\"\n        }\n \
-    \     ]\n    },\n    {\n      \"collapsed\": false,\n      \"gridPos\": {\n  \
-    \      \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n        \"y\": 7\n  \
-    \    },\n      \"id\": 102,\n      \"title\": \"Nemotron 49B\",\n      \"type\"\
-    : \"row\"\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n\
-    \          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n\
-    \      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n\
-    \        \"y\": 8\n      },\n      \"id\": 20,\n      \"title\": \"Nemotron 49B\
-    \ Active Running Requests\",\n      \"type\": \"stat\",\n      \"targets\": [\n\
+    \  \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_POWER_USAGE{node=~\\\
+    \"colt-gpu-01|haze\\\"}) or sum(DCGM_FI_DEV_POWER_USAGE)\",\n          \"legendFormat\"\
+    : \"Power Draw (W)\"\n        }\n      ]\n    },\n    {\n      \"collapsed\":\
+    \ false,\n      \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n      \
+    \  \"x\": 0,\n        \"y\": 7\n      },\n      \"id\": 102,\n      \"title\"\
+    : \"Nemotron 49B\",\n      \"type\": \"row\"\n    },\n    {\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"noValue\": \"0\"\n        },\n     \
+    \   \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n   \
+    \     \"w\": 6,\n        \"x\": 0,\n        \"y\": 8\n      },\n      \"id\":\
+    \ 20,\n      \"title\": \"Nemotron 49B Active Running Requests\",\n      \"type\"\
+    : \"stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"vllm:num_requests_running{node=~\\\"colt-gpu-01|haze\\\
+    \",model_name=~\\\"(?i).*nemotron.*\\\"} or vllm:num_requests_running{node=~\\\
+    \"colt-gpu-01|haze\\\"}\",\n          \"legendFormat\": \"Running\"\n        }\n\
+    \      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n \
+    \         \"noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 6,\n\
+    \        \"y\": 8\n      },\n      \"id\": 21,\n      \"title\": \"Nemotron 49B\
+    \ Queued Waiting Requests\",\n      \"type\": \"stat\",\n      \"targets\": [\n\
     \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
-    vllm:num_requests_running{node=\\\"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
-    \"} or vllm:num_requests_running{node=\\\"haze\\\"}\",\n          \"legendFormat\"\
-    : \"Running\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n \
-    \       \"defaults\": {\n          \"noValue\": \"0\"\n        },\n        \"\
-    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
-    w\": 6,\n        \"x\": 6,\n        \"y\": 8\n      },\n      \"id\": 21,\n  \
-    \    \"title\": \"Nemotron 49B Queued Waiting Requests\",\n      \"type\": \"\
-    stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
-    ,\n          \"expr\": \"vllm:num_requests_waiting{node=\\\"haze\\\",model_name=~\\\
-    \"(?i).*nemotron.*\\\"} or vllm:num_requests_waiting{node=\\\"haze\\\"}\",\n \
-    \         \"legendFormat\": \"Waiting\"\n        }\n      ]\n    },\n    {\n \
-    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\
-    ,\n          \"unit\": \"percent\"\n        },\n        \"overrides\": []\n  \
-    \    },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
-    x\": 12,\n        \"y\": 8\n      },\n      \"id\": 22,\n      \"title\": \"Nemotron\
-    \ 49B GPU KV Cache Usage (%)\",\n      \"type\": \"gauge\",\n      \"targets\"\
-    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
-    : \"(vllm:kv_cache_usage_perc{node=\\\"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
-    \"} or vllm:kv_cache_usage_perc{node=\\\"haze\\\"}) * 100\",\n          \"legendFormat\"\
-    : \"KV Cache %\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n\
-    \        \"defaults\": {\n          \"noValue\": \"0\"\n        },\n        \"\
-    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
-    w\": 6,\n        \"x\": 18,\n        \"y\": 8\n      },\n      \"id\": 23,\n \
-    \     \"title\": \"Nemotron 49B Completed Requests Total\",\n      \"type\": \"\
-    stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
-    ,\n          \"expr\": \"vllm:request_success_total{node=\\\"haze\\\",model_name=~\\\
-    \"(?i).*nemotron.*\\\"} or vllm:request_success_total{node=\\\"haze\\\"}\",\n\
-    \          \"legendFormat\": \"Success Total\"\n        }\n      ]\n    },\n \
-    \   {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
-    : \"0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-    \        \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 14\n\
-    \      },\n      \"id\": 24,\n      \"title\": \"Nemotron 49B Token Generation\
-    \ & Ingestion Speed (tokens/s)\",\n      \"type\": \"timeseries\",\n      \"targets\"\
-    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
-    : \"sum(rate(vllm:generation_tokens_total{node=\\\"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
-    \"}[1m])) or sum(rate(vllm:generation_tokens_total{node=\\\"haze\\\"}[1m]))\"\
-    ,\n          \"legendFormat\": \"Gen Tokens/s\"\n        },\n        {\n     \
-    \     \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(rate(vllm:prompt_tokens_total{node=\\\
-    \"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[1m])) or sum(rate(vllm:prompt_tokens_total{node=\\\
-    \"haze\\\"}[1m]))\",\n          \"legendFormat\": \"Prompt Tokens/s\"\n      \
-    \  }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\":\
-    \ {\n          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n   \
+    vllm:num_requests_waiting{node=~\\\"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
+    \"} or vllm:num_requests_waiting{node=~\\\"colt-gpu-01|haze\\\"}\",\n        \
+    \  \"legendFormat\": \"Waiting\"\n        }\n      ]\n    },\n    {\n      \"\
+    fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\",\n   \
+    \       \"unit\": \"percent\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 12,\n\
+    \        \"y\": 8\n      },\n      \"id\": 22,\n      \"title\": \"Nemotron 49B\
+    \ GPU KV Cache Usage (%)\",\n      \"type\": \"gauge\",\n      \"targets\": [\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    (vllm:kv_cache_usage_perc{node=~\\\"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
+    \"} or vllm:kv_cache_usage_perc{node=~\\\"colt-gpu-01|haze\\\"}) * 100\",\n  \
+    \        \"legendFormat\": \"KV Cache %\"\n        }\n      ]\n    },\n    {\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"\
+    0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n \
+    \       \"h\": 6,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\": 8\n \
+    \     },\n      \"id\": 23,\n      \"title\": \"Nemotron 49B Completed Requests\
+    \ Total\",\n      \"type\": \"stat\",\n      \"targets\": [\n        {\n     \
+    \     \"datasource\": \"Prometheus\",\n          \"expr\": \"vllm:request_success_total{node=~\\\
+    \"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"} or vllm:request_success_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}\",\n          \"legendFormat\": \"Success Total\"\n  \
+    \      }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n   \
+    \   },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"\
+    x\": 0,\n        \"y\": 14\n      },\n      \"id\": 24,\n      \"title\": \"Nemotron\
+    \ 49B Token Generation & Ingestion Speed (tokens/s)\",\n      \"type\": \"timeseries\"\
+    ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"sum(rate(vllm:generation_tokens_total{node=~\\\"colt-gpu-01|haze\\\
+    \",model_name=~\\\"(?i).*nemotron.*\\\"}[1m])) or sum(rate(vllm:generation_tokens_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}[1m]))\",\n          \"legendFormat\": \"Gen Tokens/s\"\
+    \n        },\n        {\n          \"datasource\": \"Prometheus\",\n         \
+    \ \"expr\": \"sum(rate(vllm:prompt_tokens_total{node=~\\\"colt-gpu-01|haze\\\"\
+    ,model_name=~\\\"(?i).*nemotron.*\\\"}[1m])) or sum(rate(vllm:prompt_tokens_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}[1m]))\",\n          \"legendFormat\": \"Prompt Tokens/s\"\
+    \n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n   \
     \   },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"\
     x\": 12,\n        \"y\": 14\n      },\n      \"id\": 25,\n      \"title\": \"\
     Nemotron 49B Native Tool Call Parser Invocations\",\n      \"type\": \"timeseries\"\
     ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
-    \          \"expr\": \"vllm:tool_call_parser_invocations_total{node=\\\"haze\\\
-    \",model_name=~\\\"(?i).*nemotron.*\\\"} or vllm:tool_call_parser_invocations_total{node=\\\
-    \"haze\\\"}\",\n          \"legendFormat\": \"{{parser}} Invocations\"\n     \
-    \   }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    \          \"expr\": \"vllm:tool_call_parser_invocations_total{node=~\\\"colt-gpu-01|haze\\\
+    \",model_name=~\\\"(?i).*nemotron.*\\\"} or vllm:tool_call_parser_invocations_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}\",\n          \"legendFormat\": \"{{parser}} Invocations\"\
+    \n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
     : {\n          \"noValue\": \"0\",\n          \"unit\": \"ms\"\n        },\n \
     \       \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 8,\n\
     \        \"w\": 24,\n        \"x\": 0,\n        \"y\": 22\n      },\n      \"\
     id\": 26,\n      \"title\": \"Nemotron 49B Request Latency p95 (ms)\",\n     \
     \ \"type\": \"timeseries\",\n      \"targets\": [\n        {\n          \"datasource\"\
-    : \"Prometheus\",\n          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\
-    \"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
-    \ sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
-    \ (le))) * 1000\",\n          \"legendFormat\": \"End-to-End Latency p95 ms\"\n\
-    \        },\n        {\n          \"datasource\": \"Prometheus\",\n          \"\
-    expr\": \"(histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\
-    \"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
-    \ sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
-    \ (le))) * 1000\",\n          \"legendFormat\": \"Time to First Token (TTFT) p95\
-    \ ms\"\n        }\n      ]\n    },\n    {\n      \"collapsed\": false,\n     \
-    \ \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n \
-    \       \"y\": 30\n      },\n      \"id\": 103,\n      \"title\": \"Llama 3.3\
-    \ 70B\",\n      \"type\": \"row\"\n    },\n    {\n      \"fieldConfig\": {\n \
-    \       \"defaults\": {\n          \"noValue\": \"0\"\n        },\n        \"\
-    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
-    w\": 6,\n        \"x\": 0,\n        \"y\": 31\n      },\n      \"id\": 30,\n \
-    \     \"title\": \"Llama 3.3 70B Active Running Requests\",\n      \"type\": \"\
-    stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
-    ,\n          \"expr\": \"vllm:num_requests_running{node=\\\"haze\\\",model_name=~\\\
-    \"(?i).*llama.*\\\"} or vllm:num_requests_running{node=\\\"haze\\\"}\",\n    \
-    \      \"legendFormat\": \"Running\"\n        }\n      ]\n    },\n    {\n    \
-    \  \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\n\
-    \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n     \
-    \   \"h\": 6,\n        \"w\": 6,\n        \"x\": 6,\n        \"y\": 31\n     \
-    \ },\n      \"id\": 31,\n      \"title\": \"Llama 3.3 70B Queued Waiting Requests\"\
+    : \"Prometheus\",\n          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=~\\\
+    \"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[5m])) by (le)) or\
+    \ histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=~\\\
+    \"colt-gpu-01|haze\\\"}[5m])) by (le))) * 1000\",\n          \"legendFormat\"\
+    : \"End-to-End Latency p95 ms\"\n        },\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=~\\\
+    \"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[5m])) by (le)) or\
+    \ histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=~\\\
+    \"colt-gpu-01|haze\\\"}[5m])) by (le))) * 1000\",\n          \"legendFormat\"\
+    : \"Time to First Token (TTFT) p95 ms\"\n        }\n      ]\n    },\n    {\n \
+    \     \"collapsed\": false,\n      \"gridPos\": {\n        \"h\": 1,\n       \
+    \ \"w\": 24,\n        \"x\": 0,\n        \"y\": 30\n      },\n      \"id\": 103,\n\
+    \      \"title\": \"Llama 3.3 70B\",\n      \"type\": \"row\"\n    },\n    {\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"\
+    0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n \
+    \       \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 31\n \
+    \     },\n      \"id\": 30,\n      \"title\": \"Llama 3.3 70B Active Running Requests\"\
     ,\n      \"type\": \"stat\",\n      \"targets\": [\n        {\n          \"datasource\"\
-    : \"Prometheus\",\n          \"expr\": \"vllm:num_requests_waiting{node=\\\"haze\\\
-    \",model_name=~\\\"(?i).*llama.*\\\"} or vllm:num_requests_waiting{node=\\\"haze\\\
-    \"}\",\n          \"legendFormat\": \"Waiting\"\n        }\n      ]\n    },\n\
-    \    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
+    : \"Prometheus\",\n          \"expr\": \"vllm:num_requests_running{node=~\\\"\
+    colt-gpu-01|haze\\\",model_name=~\\\"(?i).*llama.*\\\"} or vllm:num_requests_running{node=~\\\
+    \"colt-gpu-01|haze\\\"}\",\n          \"legendFormat\": \"Running\"\n        }\n\
+    \      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n \
+    \         \"noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 6,\n\
+    \        \"y\": 31\n      },\n      \"id\": 31,\n      \"title\": \"Llama 3.3\
+    \ 70B Queued Waiting Requests\",\n      \"type\": \"stat\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
+    : \"vllm:num_requests_waiting{node=~\\\"colt-gpu-01|haze\\\",model_name=~\\\"\
+    (?i).*llama.*\\\"} or vllm:num_requests_waiting{node=~\\\"colt-gpu-01|haze\\\"\
+    }\",\n          \"legendFormat\": \"Waiting\"\n        }\n      ]\n    },\n  \
+    \  {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
     : \"0\",\n          \"unit\": \"percent\"\n        },\n        \"overrides\":\
     \ []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n \
     \       \"x\": 12,\n        \"y\": 31\n      },\n      \"id\": 32,\n      \"title\"\
     : \"Llama 3.3 70B GPU KV Cache Usage (%)\",\n      \"type\": \"gauge\",\n    \
     \  \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n    \
-    \      \"expr\": \"(vllm:kv_cache_usage_perc{node=\\\"haze\\\",model_name=~\\\"\
-    (?i).*llama.*\\\"} or vllm:kv_cache_usage_perc{node=\\\"haze\\\"}) * 100\",\n\
-    \          \"legendFormat\": \"KV Cache %\"\n        }\n      ]\n    },\n    {\n\
-    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"\
-    0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n \
-    \       \"h\": 6,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\": 31\n\
-    \      },\n      \"id\": 33,\n      \"title\": \"Llama 3.3 70B Completed Requests\
-    \ Total\",\n      \"type\": \"stat\",\n      \"targets\": [\n        {\n     \
-    \     \"datasource\": \"Prometheus\",\n          \"expr\": \"vllm:request_success_total{node=\\\
-    \"haze\\\",model_name=~\\\"(?i).*llama.*\\\"} or vllm:request_success_total{node=\\\
-    \"haze\\\"}\",\n          \"legendFormat\": \"Success Total\"\n        }\n   \
-    \   ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n    \
-    \      \"noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n \
-    \     \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n\
-    \        \"y\": 37\n      },\n      \"id\": 34,\n      \"title\": \"Llama 3.3\
-    \ 70B Token Generation & Ingestion Speed (tokens/s)\",\n      \"type\": \"timeseries\"\
+    \      \"expr\": \"(vllm:kv_cache_usage_perc{node=~\\\"colt-gpu-01|haze\\\",model_name=~\\\
+    \"(?i).*llama.*\\\"} or vllm:kv_cache_usage_perc{node=~\\\"colt-gpu-01|haze\\\"\
+    }) * 100\",\n          \"legendFormat\": \"KV Cache %\"\n        }\n      ]\n\
+    \    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
+    noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\":\
+    \ 31\n      },\n      \"id\": 33,\n      \"title\": \"Llama 3.3 70B Completed\
+    \ Requests Total\",\n      \"type\": \"stat\",\n      \"targets\": [\n       \
+    \ {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"vllm:request_success_total{node=~\\\
+    \"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*llama.*\\\"} or vllm:request_success_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}\",\n          \"legendFormat\": \"Success Total\"\n  \
+    \      }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n   \
+    \   },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"\
+    x\": 0,\n        \"y\": 37\n      },\n      \"id\": 34,\n      \"title\": \"Llama\
+    \ 3.3 70B Token Generation & Ingestion Speed (tokens/s)\",\n      \"type\": \"\
+    timeseries\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"sum(rate(vllm:generation_tokens_total{node=~\\\"colt-gpu-01|haze\\\
+    \",model_name=~\\\"(?i).*llama.*\\\"}[1m])) or sum(rate(vllm:generation_tokens_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}[1m]))\",\n          \"legendFormat\": \"Gen Tokens/s\"\
+    \n        },\n        {\n          \"datasource\": \"Prometheus\",\n         \
+    \ \"expr\": \"sum(rate(vllm:prompt_tokens_total{node=~\\\"colt-gpu-01|haze\\\"\
+    ,model_name=~\\\"(?i).*llama.*\\\"}[1m])) or sum(rate(vllm:prompt_tokens_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}[1m]))\",\n          \"legendFormat\": \"Prompt Tokens/s\"\
+    \n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n   \
+    \   },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"\
+    x\": 12,\n        \"y\": 37\n      },\n      \"id\": 35,\n      \"title\": \"\
+    Llama 3.3 70B Native Tool Call Parser Invocations\",\n      \"type\": \"timeseries\"\
     ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
-    \          \"expr\": \"sum(rate(vllm:generation_tokens_total{node=\\\"haze\\\"\
-    ,model_name=~\\\"(?i).*llama.*\\\"}[1m])) or sum(rate(vllm:generation_tokens_total{node=\\\
-    \"haze\\\"}[1m]))\",\n          \"legendFormat\": \"Gen Tokens/s\"\n        },\n\
-    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
-    sum(rate(vllm:prompt_tokens_total{node=\\\"haze\\\",model_name=~\\\"(?i).*llama.*\\\
-    \"}[1m])) or sum(rate(vllm:prompt_tokens_total{node=\\\"haze\\\"}[1m]))\",\n \
-    \         \"legendFormat\": \"Prompt Tokens/s\"\n        }\n      ]\n    },\n\
-    \    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
-    : \"0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-    \        \"h\": 8,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 37\n\
-    \      },\n      \"id\": 35,\n      \"title\": \"Llama 3.3 70B Native Tool Call\
-    \ Parser Invocations\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n\
-    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
-    vllm:tool_call_parser_invocations_total{node=\\\"haze\\\",model_name=~\\\"(?i).*llama.*\\\
-    \"} or vllm:tool_call_parser_invocations_total{node=\\\"haze\\\"}\",\n       \
-    \   \"legendFormat\": \"{{parser}} Invocations\"\n        }\n      ]\n    },\n\
-    \    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
-    : \"0\",\n          \"unit\": \"ms\"\n        },\n        \"overrides\": []\n\
-    \      },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 24,\n     \
-    \   \"x\": 0,\n        \"y\": 45\n      },\n      \"id\": 36,\n      \"title\"\
-    : \"Llama 3.3 70B Request Latency p95 (ms)\",\n      \"type\": \"timeseries\"\
-    ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
-    \          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\
-    \"haze\\\",model_name=~\\\"(?i).*llama.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
-    \ sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
-    \ (le))) * 1000\",\n          \"legendFormat\": \"End-to-End Latency p95 ms\"\n\
-    \        },\n        {\n          \"datasource\": \"Prometheus\",\n          \"\
-    expr\": \"(histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\
-    \"haze\\\",model_name=~\\\"(?i).*llama.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
-    \ sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
-    \ (le))) * 1000\",\n          \"legendFormat\": \"Time to First Token (TTFT) p95\
-    \ ms\"\n        }\n      ]\n    }\n  ],\n  \"refresh\": \"10s\",\n  \"schemaVersion\"\
-    : 38,\n  \"style\": \"dark\",\n  \"tags\": [\n    \"haze\",\n    \"gx10\",\n \
-    \   \"vllm\",\n    \"llama33\",\n    \"nemotron\",\n    \"ai\"\n  ],\n  \"time\"\
-    : {\n    \"from\": \"now-30m\",\n    \"to\": \"now\"\n  },\n  \"title\": \"Colt\
-    \ GPU-01 & Nemotron-49B Inference Overview\",\n  \"uid\": \"haze-gx10-inference-overview\"\
-    \n}"
+    \          \"expr\": \"vllm:tool_call_parser_invocations_total{node=~\\\"colt-gpu-01|haze\\\
+    \",model_name=~\\\"(?i).*llama.*\\\"} or vllm:tool_call_parser_invocations_total{node=~\\\
+    \"colt-gpu-01|haze\\\"}\",\n          \"legendFormat\": \"{{parser}} Invocations\"\
+    \n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"noValue\": \"0\",\n          \"unit\": \"ms\"\n        },\n \
+    \       \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 8,\n\
+    \        \"w\": 24,\n        \"x\": 0,\n        \"y\": 45\n      },\n      \"\
+    id\": 36,\n      \"title\": \"Llama 3.3 70B Request Latency p95 (ms)\",\n    \
+    \  \"type\": \"timeseries\",\n      \"targets\": [\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=~\\\
+    \"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*llama.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
+    \ sum(rate(vllm:e2e_request_latency_seconds_bucket{node=~\\\"colt-gpu-01|haze\\\
+    \"}[5m])) by (le))) * 1000\",\n          \"legendFormat\": \"End-to-End Latency\
+    \ p95 ms\"\n        },\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=~\\\
+    \"colt-gpu-01|haze\\\",model_name=~\\\"(?i).*llama.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
+    \ sum(rate(vllm:time_to_first_token_seconds_bucket{node=~\\\"colt-gpu-01|haze\\\
+    \"}[5m])) by (le))) * 1000\",\n          \"legendFormat\": \"Time to First Token\
+    \ (TTFT) p95 ms\"\n        }\n      ]\n    }\n  ],\n  \"refresh\": \"10s\",\n\
+    \  \"schemaVersion\": 38,\n  \"style\": \"dark\",\n  \"tags\": [\n    \"haze\"\
+    ,\n    \"gx10\",\n    \"vllm\",\n    \"llama33\",\n    \"nemotron\",\n    \"ai\"\
+    \n  ],\n  \"time\": {\n    \"from\": \"now-30m\",\n    \"to\": \"now\"\n  },\n\
+    \  \"title\": \"Colt GPU-01 & Nemotron-49B Inference Overview\",\n  \"uid\": \"\
+    haze-gx10-inference-overview\"\n}"
