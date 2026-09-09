@@ -28,6 +28,7 @@ spec:
             - -c
             - |
               set -euo pipefail
+              apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
               pip install --no-cache-dir olah
               exec olah-cli \
                 --repos-path /data/cache \
@@ -43,6 +44,8 @@ spec:
           env:
             - name: PYTHONUNBUFFERED
               value: "1"
+            - name: GIT_PYTHON_REFRESH
+              value: "quiet"
           volumeMounts:
             - name: cache-storage
               mountPath: /data/cache
