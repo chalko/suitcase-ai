@@ -1,3 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nemotron-49b-config
+  namespace: nim-system
+  labels:
+    app.kubernetes.io/name: nemotron-49b
+    app.kubernetes.io/component: llm-inference
+data:
+  NIM_MODEL_NAME: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+  NIM_MODEL_PROFILE: "498e09394f7016bb2f08d830e3da8ad03dcf7b027a227d57f397cc69682f05c8"
+  MODEL_DIR: "models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,25 +34,24 @@ spec:
       initContainers:
         # Phase 1A: Target model cache directory
         - name: depot-hydration-preflight
-          env:
-            - name: MODEL_DIR
-              value: "models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+          envFrom:
+            - configMapRef:
+                name: nemotron-49b-config
         # Phase 1B: Model profile download & validation
         - name: download-model
-          image: nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5:latest
-          args: ["--use-cache", "--profiles", "498e09394f7016bb2f08d830e3da8ad03dcf7b027a227d57f397cc69682f05c8"]
-          env:
-            - name: NIM_MODEL_NAME
-              value: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+          image: nim-model-image
+          args: ["--use-cache", "--profiles", "$(NIM_MODEL_PROFILE)"]
+          envFrom:
+            - configMapRef:
+                name: nemotron-49b-config
       # Phase 2: Runtime Inference Engine
       containers:
         - name: nemotron-engine
-          image: nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5:latest
+          image: nim-model-image
+          envFrom:
+            - configMapRef:
+                name: nemotron-49b-config
           env:
-            - name: NIM_MODEL_NAME
-              value: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
-            - name: NIM_MODEL_PROFILE
-              value: "498e09394f7016bb2f08d830e3da8ad03dcf7b027a227d57f397cc69682f05c8"
             - name: NIM_GPU_MEMORY_UTILIZATION
               value: "0.75"
             - name: NIM_PASSTHROUGH_ARGS

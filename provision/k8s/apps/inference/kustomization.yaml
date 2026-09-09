@@ -5,6 +5,11 @@ resources:
   - namespace.yaml
   - nemotron-49b.yaml
 
+images:
+  - name: nim-model-image
+    newName: nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5
+    newTag: latest
+
 patches:
   - path: mixins/gb10-affinity.yaml
     target:
