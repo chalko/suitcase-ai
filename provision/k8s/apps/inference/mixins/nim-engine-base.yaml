@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-base
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: ngc-imagepull-secret

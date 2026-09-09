@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-base
+spec:
+  template:
+    spec:
+      volumes:
+        - name: local-ready-cache
+          hostPath:
+            path: /workspace/models/fast-cache
+            type: DirectoryOrCreate
+        - name: model-depot-storage
+          hostPath:
+            path: /mnt/model-depot
+            type: DirectoryOrCreate
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+        - name: proc
+          hostPath:
+            path: /proc
