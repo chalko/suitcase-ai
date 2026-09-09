@@ -8,7 +8,7 @@ resources:
   - ingress/ingress-nginx.yaml
   - vault/vault-auth-rbac.yaml
   - gitea
-  - nvidia/nvidia-device-plugin.yaml
+  - nvidia
   - cert-manager/release.yaml
   - cert-manager/cluster-issuer.yaml
   - harbor
