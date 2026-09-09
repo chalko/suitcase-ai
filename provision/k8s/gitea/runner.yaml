@@ -26,6 +26,8 @@ spec:
           emptyDir: {}
         - name: dind-storage
           emptyDir: {}
+        - name: docker-sock
+          emptyDir: {}
       containers:
         - name: dind
           image: docker:27.5.1-dind
@@ -38,6 +40,8 @@ spec:
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
+            - name: docker-sock
+              mountPath: /var/run
           resources:
             requests:
               cpu: "500m"
@@ -48,6 +52,16 @@ spec:
         - name: runner
           image: gitea/act_runner:0.2.11
           imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for Docker socket to become available..."
+              while [ ! -S /var/run/docker.sock ]; do
+                sleep 1
+              done
+              echo "Docker socket ready. Starting act_runner daemon..."
+              exec act_runner daemon --config /config/config.yaml
           env:
             - name: GITEA_INSTANCE_URL
               value: "https://gitea.colt.chalko.com"
@@ -59,7 +73,7 @@ spec:
             - name: GITEA_RUNNER_NAME
               value: "colt-k8s-runner-01"
             - name: DOCKER_HOST
-              value: "tcp://localhost:2375"
+              value: "unix:///var/run/docker.sock"
             - name: CONFIG_FILE
               value: "/config/config.yaml"
           volumeMounts:
@@ -67,6 +81,8 @@ spec:
               mountPath: /config
             - name: runner-data
               mountPath: /data
+            - name: docker-sock
+              mountPath: /var/run
           resources:
             requests:
               cpu: "250m"
