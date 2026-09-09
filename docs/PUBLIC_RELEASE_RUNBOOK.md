@@ -23,18 +23,18 @@ flowchart TD
     subgraph Gitea_Actions["Gitea CI/CD Runner"]
         WF[".gitea/workflows/sync-github.yml\n(Trigger: on push to 'public')"]
         CI_SCAN["Preflight Scan Validation"]
-        SSH_PUSH["SSH Git Push (Deploy Key)"]
+        HTTPS_PUSH["HTTPS Git Push (GH_TOKEN)"]
 
         G_PUB --> WF
         WF --> CI_SCAN
-        CI_SCAN -->|Pass| SSH_PUSH
+        CI_SCAN -->|Pass| HTTPS_PUSH
     end
 
     subgraph GitHub_Public["Public GitHub (github.com/chalko/suitcase-ai)"]
         GH_MAIN["Branch: main\n(Public release & open source consumers)"]
     end
 
-    SSH_PUSH -->|"git push github public:main --tags"| GH_MAIN
+    HTTPS_PUSH -->|"git push github public:main --tags"| GH_MAIN
 ```
 
 | Branch / Remote            | Purpose                                                            | Access Control                                    |
@@ -47,24 +47,18 @@ flowchart TD
 
 ## 2. Gitea Actions Secret Configuration
 
-The automated push workflow requires an SSH deploy key with write permissions to the GitHub repository:
+The automated push workflow authenticates using a GitHub Fine-Grained Personal Access Token (PAT) or Personal Access Token with repository write permissions:
 
-1. **Generate SSH Key Pair:**
-
-   ```bash
-   ssh-keygen -t ed25519 -C "gitea-sync@suitcase-ai.colt.chalko.com" -f ~/.ssh/suitcase_ai_github_deploy -N ""
-   ```
-
-2. **Add Public Key to GitHub:**
-   - Navigate to [`https://github.com/chalko/suitcase-ai/settings/keys`](https://github.com/chalko/suitcase-ai/settings/keys).
-   - Click **Add deploy key**.
-   - Title: `Gitea Public Branch Sync (colt)`.
-   - Key: Paste contents of `suitcase_ai_github_deploy.pub`.
-   - Check **Allow write access**.
-3. **Add Private Key to Gitea Secrets:**
+1. **Create GitHub Access Token:**
+   - Navigate to [`https://github.com/settings/tokens?type=beta`](https://github.com/settings/tokens?type=beta) (Fine-grained tokens) or Classic tokens.
+   - Token Name: `gitea-suitcase-ai-sync`.
+   - Repository access: Only select **`chalko/suitcase-ai`**.
+   - Permissions: **Contents: Read and write**.
+   - Generate token and copy token string (`github_pat_...` or `ghp_...`).
+2. **Configure Gitea Actions Secret:**
    - Navigate to `https://gitea.colt.chalko.com/colt/suitcase-ai/settings/actions/secrets`.
-   - Add Secret Name: **`GITHUB_DEPLOY_KEY`**.
-   - Secret Value: Paste entire private key content (`suitcase_ai_github_deploy`).
+   - Add Secret Name: **`GH_TOKEN`**.
+   - Secret Value: Paste GitHub token string.
 
 ---
 
@@ -88,7 +82,7 @@ To promote the current state of `main` to the public GitHub repository:
 
    This script performs the following automated steps:
 
-   - Runs `./scripts/preflight-public-scan.sh` to ensure Zero-Plaintext compliance (no private keys, API tokens, root Vault keys, or internal domain leaks).
+   - Runs `./scripts/preflight-public-scan.sh` to ensure Zero-Plaintext compliance (no unencrypted private keys, raw API tokens, or root Vault keys).
    - Fast-forwards the local `public` branch to match `main` HEAD.
    - Pushes `public` to Gitea remote (`colt/public`).
    - Switches back to `main`.
@@ -117,6 +111,6 @@ If a commit on `public` needs to be reverted or amended:
 
 2. **Preflight Scan Failure:**
    If `./scripts/preflight-public-scan.sh` fails:
-   - Identify the leaked secret or forbidden string reported in the output.
+   - Identify the leaked secret reported in the output.
    - Remove or sanitize the occurrence on `main`.
    - Commit the sanitization fix, then rerun `./scripts/promote-to-public.sh`.

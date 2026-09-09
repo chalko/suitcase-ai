@@ -22,11 +22,11 @@ jobs:
 
       - name: Push to GitHub Main
         env:
-          GITHUB_DEPLOY_KEY: ${{ secrets.GITHUB_DEPLOY_KEY }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          mkdir -p ~/.ssh
-          echo "$GITHUB_DEPLOY_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
-          git remote add github git@github.com:chalko/suitcase-ai.git || true
+          if [ -z "$GH_TOKEN" ]; then
+            echo "❌ ERROR: GH_TOKEN secret is not set in Gitea."
+            exit 1
+          fi
+          git remote add github "https://x-access-token:${GH_TOKEN}@github.com/chalko/suitcase-ai.git" || true
           git push -u github public:main --tags

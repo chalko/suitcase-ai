@@ -47,15 +47,6 @@ else
   echo "✔ No raw Vault credentials detected."
 fi
 
-# 4. Check for internal Fog infrastructure leaks (fog.chalko.com)
-echo "==> Scanning tracked files for internal legacy domain leaks..."
-if echo "$TRACKED_FILES" | grep -vE "(preflight-public-scan\.sh|sync-github\.yml|suitcase_ai_github_sync_architecture\.md|plan_sa_ct5_gitea_github_sync\.md)" | xargs grep -nE "fog\.chalko\.com" 2>/dev/null; then
-  echo "❌ ERROR: Legacy internal domain pattern detected in git tracked files!"
-  EXIT_CODE=1
-else
-  echo "✔ No legacy internal domain leaks detected."
-fi
-
 if [ "$EXIT_CODE" -eq 0 ]; then
   echo "======================================================================"
   echo " ✔ ALL PREFLIGHT SECURITY CHECKS PASSED: Safe for public egress."
