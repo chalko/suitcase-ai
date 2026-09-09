@@ -1,0 +1,26 @@
+apiVersion: inference.colt.ai/v1alpha1
+kind: SparkRecipe
+metadata:
+  name: north-mini-code-nvfp4
+  labels:
+    tier: community-arena
+    quant: nvfp4
+spec:
+  model:
+    id: "North-Mini-Code-NVFP4"
+    directory: "models--north--mini-code-nvfp4"
+    source: "huggingface"
+  runtime:
+    engine: "vllm"
+    image: "ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest"
+    gpuMemoryUtilization: 0.70
+    maxNumSeqs: 128
+    maxModelLen: 16384
+    passthroughArgs: "--quantization fp4 --enforce-eager --kv-cache-dtype fp8"
+  hardware:
+    accelerator: "gb10"
+    arch: "arm64"
+    gpuCount: 1
+  storage:
+    depotSource: "/mnt/model-depot/huggingface/hub/models--north--mini-code-nvfp4"
+    readyTarget: "/opt/nim/.cache/huggingface/hub/models--north--mini-code-nvfp4"

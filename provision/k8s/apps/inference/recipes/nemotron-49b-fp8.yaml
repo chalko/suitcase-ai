@@ -1,0 +1,27 @@
+apiVersion: inference.colt.ai/v1alpha1
+kind: SparkRecipe
+metadata:
+  name: nemotron-49b-fp8
+  labels:
+    tier: flagship
+    quant: fp8
+spec:
+  model:
+    id: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+    directory: "models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+    source: "ngc"
+  runtime:
+    engine: "nim"
+    image: "nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5:latest"
+    profile: "498e09394f7016bb2f08d830e3da8ad03dcf7b027a227d57f397cc69682f05c8"
+    gpuMemoryUtilization: 0.75
+    maxNumSeqs: 64
+    maxModelLen: 32768
+    passthroughArgs: "--enable-prefix-caching --kv-cache-dtype fp8 --enable-auto-tool-choice --tool-call-parser llama3_json"
+  hardware:
+    accelerator: "gb10"
+    arch: "arm64"
+    gpuCount: 1
+  storage:
+    depotSource: "/mnt/model-depot/nims/validated/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
+    readyTarget: "/opt/nim/.cache/ngc/hub/models--nim--nvidia--llama-3.3-nemotron-super-49b-v1.5"
