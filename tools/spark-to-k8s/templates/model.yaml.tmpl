@@ -1,0 +1,325 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Name }}
+  namespace: {{ .Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Name }}
+    app.kubernetes.io/component: llm-inference
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Name }}
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        accelerator: gb10
+        nvidia.com/gpu.present: "true"
+      runtimeClassName: nvidia
+      hostNetwork: true
+      dnsPolicy: Default
+      {{- if eq .Engine "nim" }}
+      imagePullSecrets:
+        - name: ngc-imagepull-secret
+      {{- end }}
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "dedicated"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+      initContainers:
+        - name: depot-hydration-preflight
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "==> [Phase 1A] Checking NVMe fast cache for {{ .Name }}..."
+              TARGET="{{ .ReadyTarget }}"
+              SOURCE="{{ .DepotSource }}"
+              mkdir -p {{ .DepotParentDir }}
+              if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
+                echo "Restoring from ModelDepot validated storage..."
+                cp -a "$SOURCE" "$TARGET"
+              fi
+              chmod -R 777 /opt/nim/.cache || true
+              echo "Syncing filesystem and verifying directory structure..."
+              sync
+              echo "Phase 1A Pre-flight completed."
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: model-depot-storage
+              mountPath: /mnt/model-depot
+              readOnly: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+        {{- if eq .Engine "nim" }}
+        - name: download-model
+          image: {{ .Image }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - download-to-cache
+          args:
+            - --use-cache
+            {{- if .Profile }}
+            - --profiles
+            - "{{ .Profile }}"
+            {{- end }}
+          env:
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ngc-secret
+                  key: NGC_API_KEY
+            - name: NIM_MODEL_NAME
+              value: "{{ .ModelID }}"
+            - name: NIM_CACHE_PATH
+              value: "/opt/nim/.cache"
+          resources:
+            requests:
+              cpu: "4"
+              memory: "8Gi"
+            limits:
+              cpu: "20"
+              memory: "110Gi"
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+        {{- else }}
+        - name: model-check
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "==> [Phase 1B] Verifying model weights in ReadyLocker..."
+              if [ -d "{{ .ReadyTarget }}" ]; then
+                echo "Model directory verified: {{ .ReadyTarget }}"
+              else
+                echo "ERROR: Model directory not found at {{ .ReadyTarget }}"
+                exit 1
+              fi
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+        {{- end }}
+        - name: cache-flusher
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "==> Flushing Linux kernel page cache after hydration..."
+              sync
+              echo 3 > /proc/sys/vm/drop_caches || true
+              echo "==> Page cache flush complete."
+          volumeMounts:
+            - name: proc
+              mountPath: /proc
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "1"
+              memory: "256Mi"
+      containers:
+        - name: {{ .Name }}-engine
+          image: {{ .Image }}
+          imagePullPolicy: IfNotPresent
+          {{- if eq .Engine "vllm" }}
+          command:
+            - python3
+            - -m
+            - vllm.entrypoints.openai.api_server
+          args:
+            - --model
+            - "{{ .ReadyTarget }}"
+            - --served-model-name
+            - "{{ .ModelID }}"
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --gpu-memory-utilization
+            - "{{ .GPUMemoryUtilization }}"
+            {{- if .MaxModelLen }}
+            - --max-model-len
+            - "{{ .MaxModelLen }}"
+            {{- end }}
+            {{- if .MaxNumSeqs }}
+            - --max-num-seqs
+            - "{{ .MaxNumSeqs }}"
+            {{- end }}
+            {{- range .PassthroughArgsList }}
+            - "{{ . }}"
+            {{- end }}
+          {{- end }}
+          env:
+            {{- if eq .Engine "nim" }}
+            - name: NGC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ngc-secret
+                  key: NGC_API_KEY
+            - name: NIM_CACHE_PATH
+              value: "/opt/nim/.cache"
+            - name: NIM_MODEL_NAME
+              value: "{{ .ModelID }}"
+            {{- if .Profile }}
+            - name: NIM_MODEL_PROFILE
+              value: "{{ .Profile }}"
+            {{- end }}
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: NIM_SERVER_PORT
+              value: "8000"
+            - name: NIM_BACKEND_PORT
+              value: "8001"
+            - name: NIM_HEALTH_PORT
+              value: "8002"
+            - name: NIM_GPU_MEMORY_UTILIZATION
+              value: "{{ .GPUMemoryUtilization }}"
+            - name: NIM_ENABLE_KV_CACHE_REUSE
+              value: "1"
+            {{- if .PassthroughArgs }}
+            - name: NIM_PASSTHROUGH_ARGS
+              value: "{{ .PassthroughArgs }}"
+            {{- end }}
+            {{- if .MaxNumSeqs }}
+            - name: NIM_MAX_NUM_SEQS
+              value: "{{ .MaxNumSeqs }}"
+            {{- end }}
+            {{- if .MaxModelLen }}
+            - name: NIM_MAX_MODEL_LEN
+              value: "{{ .MaxModelLen }}"
+            {{- end }}
+            {{- else }}
+            - name: HF_HOME
+              value: "/opt/nim/.cache/huggingface"
+            - name: HF_HUB_CACHE
+              value: "/opt/nim/.cache/huggingface/hub"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: VLLM_PORT
+              value: "8000"
+            {{- end }}
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "all"
+          ports:
+            - name: http-api
+              containerPort: 8000
+              protocol: TCP
+            - name: health-api
+              containerPort: 8002
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "8"
+              memory: "32Gi"
+              nvidia.com/gpu: "{{ .GPUCount }}"
+            limits:
+              cpu: "20"
+              memory: "110Gi"
+              nvidia.com/gpu: "{{ .GPUCount }}"
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+          startupProbe:
+            httpGet:
+              path: {{ if eq .Engine "nim" }}/v1/health/ready{{ else }}/health{{ end }}
+              port: {{ if eq .Engine "nim" }}8002{{ else }}8000{{ end }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 120
+          livenessProbe:
+            httpGet:
+              path: {{ if eq .Engine "nim" }}/v1/health/live{{ else }}/health{{ end }}
+              port: {{ if eq .Engine "nim" }}8002{{ else }}8000{{ end }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: {{ if eq .Engine "nim" }}/v1/health/ready{{ else }}/health{{ end }}
+              port: {{ if eq .Engine "nim" }}8002{{ else }}8000{{ end }}
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: local-ready-cache
+          hostPath:
+            path: /workspace/models/fast-cache
+            type: DirectoryOrCreate
+        - name: model-depot-storage
+          hostPath:
+            path: /mnt/model-depot
+            type: DirectoryOrCreate
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+        - name: proc
+          hostPath:
+            path: /proc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Name }}
+  namespace: {{ .Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Name }}
+    app.kubernetes.io/component: llm-inference
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Name }}
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: health
+      port: 8002
+      targetPort: {{ if eq .Engine "nim" }}8002{{ else }}8000{{ end }}
+      protocol: TCP

@@ -1,0 +1,241 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: north-mini-code-nvfp4
+  namespace: nim-system
+  labels:
+    app.kubernetes.io/name: north-mini-code-nvfp4
+    app.kubernetes.io/component: llm-inference
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: north-mini-code-nvfp4
+  template:
+    metadata:
+      labels:
+        app: north-mini-code-nvfp4
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        accelerator: gb10
+        nvidia.com/gpu.present: "true"
+      runtimeClassName: nvidia
+      hostNetwork: true
+      dnsPolicy: Default
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "dedicated"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+      initContainers:
+        - name: depot-hydration-preflight
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "==> [Phase 1A] Checking NVMe fast cache for north-mini-code-nvfp4..."
+              TARGET="/opt/nim/.cache/huggingface/hub/models--north--mini-code-nvfp4"
+              SOURCE="/mnt/model-depot/huggingface/hub/models--north--mini-code-nvfp4"
+              mkdir -p /opt/nim/.cache/huggingface/hub
+              if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
+                echo "Restoring from ModelDepot validated storage..."
+                cp -a "$SOURCE" "$TARGET"
+              fi
+              chmod -R 777 /opt/nim/.cache || true
+              echo "Syncing filesystem and verifying directory structure..."
+              sync
+              echo "Phase 1A Pre-flight completed."
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: model-depot-storage
+              mountPath: /mnt/model-depot
+              readOnly: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+        - name: model-check
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              echo "==> [Phase 1B] Verifying model weights in ReadyLocker..."
+              if [ -d "/opt/nim/.cache/huggingface/hub/models--north--mini-code-nvfp4" ]; then
+                echo "Model directory verified: /opt/nim/.cache/huggingface/hub/models--north--mini-code-nvfp4"
+              else
+                echo "ERROR: Model directory not found at /opt/nim/.cache/huggingface/hub/models--north--mini-code-nvfp4"
+                exit 1
+              fi
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+        - name: cache-flusher
+          image: docker.io/library/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "==> Flushing Linux kernel page cache after hydration..."
+              sync
+              echo 3 > /proc/sys/vm/drop_caches || true
+              echo "==> Page cache flush complete."
+          volumeMounts:
+            - name: proc
+              mountPath: /proc
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "1"
+              memory: "256Mi"
+      containers:
+        - name: north-mini-code-nvfp4-engine
+          image: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - python3
+            - -m
+            - vllm.entrypoints.openai.api_server
+          args:
+            - --model
+            - "/opt/nim/.cache/huggingface/hub/models--north--mini-code-nvfp4"
+            - --served-model-name
+            - "North-Mini-Code-NVFP4"
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --gpu-memory-utilization
+            - "0.70"
+            - --max-model-len
+            - "16384"
+            - --max-num-seqs
+            - "128"
+            - "--quantization"
+            - "fp4"
+            - "--enforce-eager"
+            - "--kv-cache-dtype"
+            - "fp8"
+          env:
+            - name: HF_HOME
+              value: "/opt/nim/.cache/huggingface"
+            - name: HF_HUB_CACHE
+              value: "/opt/nim/.cache/huggingface/hub"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: VLLM_PORT
+              value: "8000"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "all"
+          ports:
+            - name: http-api
+              containerPort: 8000
+              protocol: TCP
+            - name: health-api
+              containerPort: 8002
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "8"
+              memory: "32Gi"
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "20"
+              memory: "110Gi"
+              nvidia.com/gpu: "1"
+          volumeMounts:
+            - name: local-ready-cache
+              mountPath: /opt/nim/.cache
+            - name: dshm
+              mountPath: /dev/shm
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 120
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: local-ready-cache
+          hostPath:
+            path: /workspace/models/fast-cache
+            type: DirectoryOrCreate
+        - name: model-depot-storage
+          hostPath:
+            path: /mnt/model-depot
+            type: DirectoryOrCreate
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+        - name: proc
+          hostPath:
+            path: /proc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: north-mini-code-nvfp4
+  namespace: nim-system
+  labels:
+    app.kubernetes.io/name: north-mini-code-nvfp4
+    app.kubernetes.io/component: llm-inference
+spec:
+  type: ClusterIP
+  selector:
+    app: north-mini-code-nvfp4
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: health
+      port: 8002
+      targetPort: 8000
+      protocol: TCP
