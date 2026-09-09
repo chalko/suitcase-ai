@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'nemotron'
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ['nemotron-49b.nim-system.svc.cluster.local:8000']
+            labels:
+              instance: 'colt-gpu-01'
+              node: 'colt-gpu-01'
+              accelerator: 'NVIDIA-GB10'
+              model: 'nvidia/llama-3.3-nemotron-super-49b-v1.5'
+
+      - job_name: 'litellm'
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ['litellm.litellm.svc.cluster.local:4000']
+            labels:
+              app: 'litellm'
+
+      - job_name: 'ollama'
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ['ollama.ollama.svc.cluster.local:11434']
+            labels:
+              app: 'ollama'
+
+      - job_name: 'kubernetes-nodes'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+
+      - job_name: 'kubernetes-cadvisor'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor

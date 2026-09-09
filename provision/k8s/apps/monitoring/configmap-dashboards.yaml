@@ -1,0 +1,684 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  provider.yaml: "apiVersion: 1\nproviders:\n  - name: 'default'\n    orgId: 1\n \
+    \   folder: ''\n    type: file\n    disableDeletion: false\n    editable: true\n\
+    \    options:\n      path: /var/lib/grafana-dashboards\n"
+  proxmox-dashboard.json: "{\n  \"annotations\": { \"list\": [] },\n  \"editable\"\
+    : true,\n  \"fiscalYearStartMonth\": 0,\n  \"graphTooltip\": 0,\n  \"id\": null,\n\
+    \  \"links\": [],\n  \"liveNow\": false,\n  \"panels\": [\n    {\n      \"gridPos\"\
+    : { \"h\": 6, \"w\": 6, \"x\": 0, \"y\": 0 },\n      \"id\": 1,\n      \"title\"\
+    : \"Hypervisor CPU Usage (%)\",\n      \"type\": \"stat\",\n      \"targets\"\
+    : [\n        { \"datasource\": \"Prometheus\", \"expr\": \"pve_cpu_usage_ratio{id=~\\\
+    \"node/.*\\\"} * 100\", \"legendFormat\": \"{{node}} CPU %\" }\n      ]\n    },\n\
+    \    {\n      \"gridPos\": { \"h\": 6, \"w\": 6, \"x\": 6, \"y\": 0 },\n     \
+    \ \"id\": 2,\n      \"title\": \"Active Guests (VMs / LXCs)\",\n      \"type\"\
+    : \"stat\",\n      \"targets\": [\n        { \"datasource\": \"Prometheus\", \"\
+    expr\": \"count(pve_up{id=~\\\"(qemu|lxc)/.*\\\"})\", \"legendFormat\": \"Running\
+    \ Guests\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 6, \"w\": 12,\
+    \ \"x\": 12, \"y\": 0 },\n      \"id\": 3,\n      \"title\": \"Hypervisor Storage\
+    \ Utilization (%)\",\n      \"type\": \"stat\",\n      \"targets\": [\n      \
+    \  { \"datasource\": \"Prometheus\", \"expr\": \"(pve_disk_usage_bytes{id=~\\\"\
+    node/.*\\\"} / pve_disk_size_bytes{id=~\\\"node/.*\\\"}) * 100\", \"legendFormat\"\
+    : \"{{node}} Root Disk %\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"\
+    h\": 8, \"w\": 12, \"x\": 0, \"y\": 6 },\n      \"id\": 4,\n      \"title\": \"\
+    Hypervisor Node Memory Usage (GB)\",\n      \"type\": \"timeseries\",\n      \"\
+    targets\": [\n        { \"datasource\": \"Prometheus\", \"expr\": \"pve_memory_usage_bytes{id=~\\\
+    \"node/.*\\\"} / 1024 / 1024 / 1024\", \"legendFormat\": \"Used RAM (GB)\" },\n\
+    \        { \"datasource\": \"Prometheus\", \"expr\": \"pve_memory_size_bytes{id=~\\\
+    \"node/.*\\\"} / 1024 / 1024 / 1024\", \"legendFormat\": \"Total RAM (GB)\" }\n\
+    \      ]\n    },\n    {\n      \"gridPos\": { \"h\": 8, \"w\": 12, \"x\": 12,\
+    \ \"y\": 6 },\n      \"id\": 5,\n      \"title\": \"Guest Memory Allocations (GB)\"\
+    ,\n      \"type\": \"timeseries\",\n      \"targets\": [\n        { \"datasource\"\
+    : \"Prometheus\", \"expr\": \"pve_memory_usage_bytes{id=~\\\"(qemu|lxc)/.*\\\"\
+    } / 1024 / 1024 / 1024\", \"legendFormat\": \"{{id}} Used RAM\" }\n      ]\n \
+    \   }\n  ],\n  \"refresh\": \"10s\",\n  \"schemaVersion\": 38,\n  \"style\": \"\
+    dark\",\n  \"tags\": [\"proxmox\", \"infrastructure\"],\n  \"time\": { \"from\"\
+    : \"now-1h\", \"to\": \"now\" },\n  \"title\": \"Proxmox VE Hypervisor Dashboard\"\
+    ,\n  \"uid\": \"proxmox-ve-overview\"\n}\n"
+  k8s-dashboard.json: "{\n  \"annotations\": { \"list\": [] },\n  \"editable\": true,\n\
+    \  \"id\": null,\n  \"panels\": [\n    {\n      \"gridPos\": { \"h\": 6, \"w\"\
+    : 6, \"x\": 0, \"y\": 0 },\n      \"id\": 1,\n      \"title\": \"Total Running\
+    \ Pods\",\n      \"type\": \"stat\",\n      \"targets\": [\n        { \"datasource\"\
+    : \"Prometheus\", \"expr\": \"sum(kubelet_running_pods)\", \"legendFormat\": \"\
+    Running Pods\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 6, \"w\"\
+    : 6, \"x\": 6, \"y\": 0 },\n      \"id\": 2,\n      \"title\": \"Total Cluster\
+    \ Containers\",\n      \"type\": \"stat\",\n      \"targets\": [\n        { \"\
+    datasource\": \"Prometheus\", \"expr\": \"sum(kubelet_running_containers)\", \"\
+    legendFormat\": \"Active Containers\" }\n      ]\n    },\n    {\n      \"gridPos\"\
+    : { \"h\": 6, \"w\": 12, \"x\": 12, \"y\": 0 },\n      \"id\": 3,\n      \"title\"\
+    : \"Cluster Network Throughput (MB/s)\",\n      \"type\": \"timeseries\",\n  \
+    \    \"targets\": [\n        { \"datasource\": \"Prometheus\", \"expr\": \"sum(rate(container_network_receive_bytes_total[5m]))\
+    \ / 1024 / 1024\", \"legendFormat\": \"RX MB/s\" },\n        { \"datasource\"\
+    : \"Prometheus\", \"expr\": \"sum(rate(container_network_transmit_bytes_total[5m]))\
+    \ / 1024 / 1024\", \"legendFormat\": \"TX MB/s\" }\n      ]\n    },\n    {\n \
+    \     \"gridPos\": { \"h\": 10, \"w\": 12, \"x\": 0, \"y\": 6 },\n      \"id\"\
+    : 4,\n      \"title\": \"Top 10 Pods by CPU Utilization (Cores)\",\n      \"type\"\
+    : \"timeseries\",\n      \"targets\": [\n        { \"datasource\": \"Prometheus\"\
+    , \"expr\": \"topk(10, sum(rate(container_cpu_usage_seconds_total{container!=\\\
+    \"\\\",pod!=\\\"\\\"}[5m])) by (pod))\", \"legendFormat\": \"{{pod}}\" }\n   \
+    \   ]\n    },\n    {\n      \"gridPos\": { \"h\": 10, \"w\": 12, \"x\": 12, \"\
+    y\": 6 },\n      \"id\": 5,\n      \"title\": \"Top 10 Pods by Memory Working\
+    \ Set (MB)\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n       \
+    \ { \"datasource\": \"Prometheus\", \"expr\": \"topk(10, sum(container_memory_working_set_bytes{container!=\\\
+    \"\\\",pod!=\\\"\\\"}) by (pod)) / 1024 / 1024\", \"legendFormat\": \"{{pod}}\"\
+    \ }\n      ]\n    }\n  ],\n  \"refresh\": \"10s\",\n  \"schemaVersion\": 38,\n\
+    \  \"style\": \"dark\",\n  \"tags\": [\"k8s\", \"kubernetes\"],\n  \"time\": {\
+    \ \"from\": \"now-1h\", \"to\": \"now\" },\n  \"title\": \"Kubernetes Cluster\
+    \ Dashboard\",\n  \"uid\": \"k8s-cluster-overview\"\n}\n"
+  ollama-dashboard.json: "{\n  \"annotations\": { \"list\": [] },\n  \"editable\"\
+    : true,\n  \"id\": null,\n  \"panels\": [\n    {\n      \"gridPos\": { \"h\":\
+    \ 6, \"w\": 6, \"x\": 0, \"y\": 0 },\n      \"id\": 1,\n      \"title\": \"Ollama\
+    \ Models Loaded\",\n      \"type\": \"stat\",\n      \"targets\": [\n        {\
+    \ \"datasource\": \"Prometheus\", \"expr\": \"sum(ollama_loaded_models) or count(ollama_model_loaded\
+    \ == 1)\", \"legendFormat\": \"Loaded Models\" }\n      ]\n    },\n    {\n   \
+    \   \"gridPos\": { \"h\": 6, \"w\": 6, \"x\": 6, \"y\": 0 },\n      \"id\": 2,\n\
+    \      \"title\": \"Ollama Exporter Health\",\n      \"type\": \"stat\",\n   \
+    \   \"targets\": [\n        { \"datasource\": \"Prometheus\", \"expr\": \"up{job=\\\
+    \"ollama\\\", instance=~\\\".*8080\\\"}\", \"legendFormat\": \"Exporter Health\"\
+    \ }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 6, \"w\": 12, \"x\":\
+    \ 12, \"y\": 0 },\n      \"id\": 3,\n      \"title\": \"Active Models Status\"\
+    ,\n      \"type\": \"stat\",\n      \"targets\": [\n        { \"datasource\":\
+    \ \"Prometheus\", \"expr\": \"ollama_model_loaded\", \"legendFormat\": \"{{model}}\"\
+    \ }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 8, \"w\": 12, \"x\":\
+    \ 0, \"y\": 6 },\n      \"id\": 4,\n      \"title\": \"Ollama Model Memory Usage\
+    \ (MB)\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n        { \"\
+    datasource\": \"Prometheus\", \"expr\": \"ollama_model_ram_mb\", \"legendFormat\"\
+    : \"{{model}} RAM\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 8,\
+    \ \"w\": 12, \"x\": 12, \"y\": 6 },\n      \"id\": 5,\n      \"title\": \"Token\
+    \ Generation Speed (tokens/sec)\",\n      \"type\": \"timeseries\",\n      \"\
+    targets\": [\n        { \"datasource\": \"Prometheus\", \"expr\": \"rate(ollama_eval_tokens_total[1m])\
+    \ or rate(ollama_prompt_tokens_total[1m]) or (0 * ollama_loaded_models)\", \"\
+    legendFormat\": \"Tokens/sec\" }\n      ]\n    }\n  ],\n  \"refresh\": \"5s\"\
+    ,\n  \"schemaVersion\": 38,\n  \"style\": \"dark\",\n  \"tags\": [\"ollama\",\
+    \ \"llm\", \"ai\"],\n  \"time\": { \"from\": \"now-1h\", \"to\": \"now\" },\n\
+    \  \"title\": \"Ollama LLM Engine Dashboard\",\n  \"uid\": \"ollama-llm-overview\"\
+    \n}\n"
+  litellm-dashboard.json: "{\n  \"annotations\": { \"list\": [] },\n  \"editable\"\
+    : true,\n  \"id\": null,\n  \"panels\": [\n    {\n      \"gridPos\": { \"h\":\
+    \ 6, \"w\": 6, \"x\": 0, \"y\": 0 },\n      \"id\": 1,\n      \"title\": \"LiteLLM\
+    \ Router Status\",\n      \"type\": \"stat\",\n      \"targets\": [\n        {\
+    \ \"datasource\": \"Prometheus\", \"expr\": \"up{job=\\\"litellm\\\"}\", \"legendFormat\"\
+    : \"Gateway Health\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 6,\
+    \ \"w\": 6, \"x\": 6, \"y\": 0 },\n      \"id\": 2,\n      \"title\": \"In-Flight\
+    \ Requests\",\n      \"type\": \"stat\",\n      \"targets\": [\n        { \"datasource\"\
+    : \"Prometheus\", \"expr\": \"sum(litellm_in_flight_requests)\", \"legendFormat\"\
+    : \"In Flight\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 6, \"w\"\
+    : 6, \"x\": 12, \"y\": 0 },\n      \"id\": 3,\n      \"title\": \"Total Requests\
+    \ Served\",\n      \"type\": \"stat\",\n      \"targets\": [\n        { \"datasource\"\
+    : \"Prometheus\", \"expr\": \"sum(litellm_requests_metric_total)\", \"legendFormat\"\
+    : \"Total Requests\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 6,\
+    \ \"w\": 6, \"x\": 18, \"y\": 0 },\n      \"id\": 4,\n      \"title\": \"Proxy\
+    \ Failed Requests\",\n      \"type\": \"stat\",\n      \"targets\": [\n      \
+    \  { \"datasource\": \"Prometheus\", \"expr\": \"sum(litellm_proxy_failed_requests_metric_total)\"\
+    , \"legendFormat\": \"Errors\" }\n      ]\n    },\n    {\n      \"gridPos\": {\
+    \ \"h\": 8, \"w\": 12, \"x\": 0, \"y\": 6 },\n      \"id\": 5,\n      \"title\"\
+    : \"LiteLLM Router Request Rate by Model (req/s)\",\n      \"type\": \"timeseries\"\
+    ,\n      \"targets\": [\n        { \"datasource\": \"Prometheus\", \"expr\": \"\
+    sum(rate(litellm_requests_metric_total[1m])) by (model)\", \"legendFormat\": \"\
+    {{model}}\" }\n      ]\n    },\n    {\n      \"gridPos\": { \"h\": 8, \"w\": 12,\
+    \ \"x\": 12, \"y\": 6 },\n      \"id\": 6,\n      \"title\": \"LiteLLM Latency\
+    \ p95 (ms)\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n       \
+    \ { \"datasource\": \"Prometheus\", \"expr\": \"histogram_quantile(0.95, sum(rate(litellm_request_total_latency_metric_bucket[5m]))\
+    \ by (le)) * 1000\", \"legendFormat\": \"p95 Total Latency ms\" }\n      ]\n \
+    \   },\n    {\n      \"gridPos\": { \"h\": 8, \"w\": 24, \"x\": 0, \"y\": 14 },\n\
+    \      \"id\": 7,\n      \"title\": \"LiteLLM Token Throughput (Input vs Output\
+    \ tok/s)\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n        {\
+    \ \"datasource\": \"Prometheus\", \"expr\": \"sum(rate(litellm_input_tokens_metric_total[1m]))\"\
+    , \"legendFormat\": \"Input Tokens/s\" },\n        { \"datasource\": \"Prometheus\"\
+    , \"expr\": \"sum(rate(litellm_output_tokens_metric_total[1m]))\", \"legendFormat\"\
+    : \"Output Tokens/s\" }\n      ]\n    }\n  ],\n  \"refresh\": \"5s\",\n  \"schemaVersion\"\
+    : 38,\n  \"style\": \"dark\",\n  \"tags\": [\"litellm\", \"llm\", \"proxy\"],\n\
+    \  \"time\": { \"from\": \"now-1h\", \"to\": \"now\" },\n  \"title\": \"LiteLLM\
+    \ Proxy Router Dashboard\",\n  \"uid\": \"litellm-proxy-overview\"\n}\n"
+  executive-dashboard.json: "{\n  \"annotations\": {\n    \"list\": []\n  },\n  \"\
+    editable\": true,\n  \"fiscalYearStartMonth\": 0,\n  \"graphTooltip\": 1,\n  \"\
+    id\": null,\n  \"links\": [],\n  \"liveNow\": false,\n  \"layout\": {\n    \"\
+    type\": \"auto\",\n    \"fillScreen\": true\n  },\n  \"panels\": [\n    {\n  \
+    \    \"collapsed\": false,\n      \"gridPos\": {\n        \"h\": 1,\n        \"\
+    w\": 24,\n        \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 100,\n\
+    \      \"title\": \"Executive KPI Summary (Multi-LLM Fleet)\",\n      \"type\"\
+    : \"row\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"\
+    thresholds\"\n          },\n          \"mappings\": [],\n          \"noValue\"\
+    : \"0\",\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n \
+    \           \"steps\": [\n              {\n                \"color\": \"green\"\
+    ,\n                \"value\": null\n              },\n              {\n      \
+    \          \"color\": \"yellow\",\n                \"value\": 50\n           \
+    \   },\n              {\n                \"color\": \"red\",\n               \
+    \ \"value\": 150\n              }\n            ]\n          },\n          \"unit\"\
+    : \"tokens/s\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\n        \"h\": 4,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 1\n\
+    \      },\n      \"id\": 11,\n      \"options\": {\n        \"colorMode\": \"\
+    value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"auto\"\
+    ,\n        \"orientation\": \"auto\",\n        \"reduceOptions\": {\n        \
+    \  \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\"\
+    : \"\",\n          \"values\": false\n        },\n        \"text\": {\n      \
+    \    \"valueSize\": null\n        },\n        \"textMode\": \"auto\"\n      },\n\
+    \      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"sum(rate(vllm:generation_tokens_total[1m])) or sum(vllm:avg_generation_throughput_toks_per_s)\
+    \ or 0\",\n          \"legendFormat\": \"Output (tok/s)\"\n        },\n      \
+    \  {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(rate(vllm:prompt_tokens_total[1m]))\
+    \ or sum(vllm:avg_prompt_throughput_toks_per_s) or 0\",\n          \"legendFormat\"\
+    : \"Prompt (tok/s)\"\n        }\n      ],\n      \"title\": \"Total LLM Throughput\"\
+    ,\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n\
+    \            \"mode\": \"thresholds\"\n          },\n          \"mappings\": [],\n\
+    \          \"noValue\": \"0\",\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"\
+    color\": \"green\",\n                \"value\": null\n              },\n     \
+    \         {\n                \"color\": \"yellow\",\n                \"value\"\
+    : 10\n              },\n              {\n                \"color\": \"red\",\n\
+    \                \"value\": 30\n              }\n            ]\n          },\n\
+    \          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 6,\n        \"x\": 6,\n\
+    \        \"y\": 1\n      },\n      \"id\": 12,\n      \"options\": {\n       \
+    \ \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\"\
+    : \"auto\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\": {\n\
+    \          \"calcs\": [\n            \"lastNotNull\"\n          ],\n         \
+    \ \"fields\": \"\",\n          \"values\": false\n        },\n        \"text\"\
+    : {\n          \"valueSize\": null\n        },\n        \"textMode\": \"auto\"\
+    \n      },\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"sum(vllm:num_requests_running)\",\n          \"legendFormat\"\
+    : \"Running\"\n        },\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"sum(vllm:num_requests_waiting)\",\n          \"legendFormat\"\
+    : \"Queued\"\n        }\n      ],\n      \"title\": \"Total Active Requests\"\
+    ,\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n\
+    \            \"mode\": \"thresholds\"\n          },\n          \"mappings\": [],\n\
+    \          \"noValue\": \"0\",\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"\
+    color\": \"green\",\n                \"value\": null\n              },\n     \
+    \         {\n                \"color\": \"yellow\",\n                \"value\"\
+    : 85899345920\n              },\n              {\n                \"color\": \"\
+    red\",\n                \"value\": 120259084288\n              }\n           \
+    \ ]\n          },\n          \"unit\": \"bytes\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 6,\n \
+    \       \"x\": 12,\n        \"y\": 1\n      },\n      \"id\": 13,\n      \"options\"\
+    : {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n   \
+    \     \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n       \
+    \ \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n\
+    \          ],\n          \"fields\": \"\",\n          \"values\": false\n    \
+    \    },\n        \"text\": {\n          \"valueSize\": null\n        },\n    \
+    \    \"textMode\": \"auto\"\n      },\n      \"targets\": [\n        {\n     \
+    \     \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_FB_USED)\
+    \ * 1024 * 1024\",\n          \"legendFormat\": \"VRAM Used\"\n        },\n  \
+    \      {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_FB_USED\
+    \ + DCGM_FI_DEV_FB_FREE) * 1024 * 1024\",\n          \"legendFormat\": \"Total\
+    \ Pool\"\n        }\n      ],\n      \"title\": \"Unified GPU VRAM Used\",\n \
+    \     \"type\": \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n\
+    \            \"mode\": \"thresholds\"\n          },\n          \"mappings\": [],\n\
+    \          \"noValue\": \"0\",\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"\
+    color\": \"green\",\n                \"value\": null\n              },\n     \
+    \         {\n                \"color\": \"yellow\",\n                \"value\"\
+    : 70\n              },\n              {\n                \"color\": \"red\",\n\
+    \                \"value\": 85\n              }\n            ]\n          },\n\
+    \          \"unit\": \"percent\"\n        },\n        \"overrides\": []\n    \
+    \  },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 6,\n        \"\
+    x\": 18,\n        \"y\": 1\n      },\n      \"id\": 14,\n      \"options\": {\n\
+    \        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n       \
+    \ \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\"\
+    : {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n     \
+    \     \"fields\": \"\",\n          \"values\": false\n        },\n        \"text\"\
+    : {\n          \"valueSize\": null\n        },\n        \"textMode\": \"auto\"\
+    \n      },\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"avg(vllm:kv_cache_usage_perc) * 100\",\n          \"\
+    legendFormat\": \"Avg KV Cache %\"\n        },\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"max(vllm:kv_cache_usage_perc) * 100\"\
+    ,\n          \"legendFormat\": \"Peak KV Cache %\"\n        }\n      ],\n    \
+    \  \"title\": \"Aggregate KV Cache Capacity\",\n      \"type\": \"stat\"\n   \
+    \ },\n    {\n      \"collapsed\": false,\n      \"gridPos\": {\n        \"h\"\
+    : 1,\n        \"w\": 24,\n        \"x\": 0,\n        \"y\": 5\n      },\n    \
+    \  \"id\": 101,\n      \"title\": \"Sovereign AI & LLM Inference Performance\"\
+    ,\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n\
+    \            \"mode\": \"thresholds\"\n          },\n          \"mappings\": [],\n\
+    \          \"noValue\": \"0\",\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"\
+    color\": \"green\",\n                \"value\": null\n              },\n     \
+    \         {\n                \"color\": \"yellow\",\n                \"value\"\
+    : 5\n              },\n              {\n                \"color\": \"red\",\n\
+    \                \"value\": 9\n              }\n            ]\n          }\n \
+    \       },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n      \
+    \  \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 6\n      },\n\
+    \      \"id\": 1,\n      \"options\": {\n        \"colorMode\": \"value\",\n \
+    \       \"graphMode\": \"area\",\n        \"justifyMode\": \"auto\",\n       \
+    \ \"orientation\": \"auto\",\n        \"reduceOptions\": {\n          \"calcs\"\
+    : [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n\
+    \          \"values\": false\n        },\n        \"text\": {\n          \"valueSize\"\
+    : null\n        },\n        \"textMode\": \"auto\"\n      },\n      \"targets\"\
+    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
+    : \"sum(vllm:num_requests_running)\",\n          \"legendFormat\": \"Running\"\
+    \n        },\n        {\n          \"datasource\": \"Prometheus\",\n         \
+    \ \"expr\": \"sum(vllm:num_requests_waiting)\",\n          \"legendFormat\": \"\
+    Queued\"\n        }\n      ],\n      \"title\": \"Active Inference Requests\"\
+    ,\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"custom\": {\n\
+    \            \"axisLabel\": \"Tokens / sec\",\n            \"drawStyle\": \"line\"\
+    ,\n            \"fillOpacity\": 15,\n            \"gradientMode\": \"opacity\"\
+    ,\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\":\
+    \ 3,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false\n\
+    \          },\n          \"noValue\": \"0\",\n          \"unit\": \"short\"\n\
+    \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n     \
+    \   \"h\": 6,\n        \"w\": 18,\n        \"x\": 6,\n        \"y\": 6\n     \
+    \ },\n      \"id\": 2,\n      \"options\": {\n        \"legend\": {\n        \
+    \  \"calcs\": [\n            \"lastNotNull\",\n            \"max\"\n         \
+    \ ],\n          \"displayMode\": \"list\",\n          \"placement\": \"bottom\"\
+    ,\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n      \
+    \    \"mode\": \"multi\",\n          \"sort\": \"none\"\n        }\n      },\n\
+    \      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"sum(rate(vllm:generation_tokens_total[1m]))\",\n      \
+    \    \"legendFormat\": \"Output tok/s\"\n        },\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"sum(rate(vllm:prompt_tokens_total[1m]))\"\
+    ,\n          \"legendFormat\": \"Prompt Ingestion tok/s\"\n        }\n      ],\n\
+    \      \"title\": \"Sovereign AI Token Velocity (tokens/s)\",\n      \"type\"\
+    : \"timeseries\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n     \
+    \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n      \
+    \      \"mode\": \"thresholds\"\n          },\n          \"mappings\": [],\n \
+    \         \"max\": 100,\n          \"min\": 0,\n          \"noValue\": \"0\",\n\
+    \          \"thresholds\": {\n            \"mode\": \"absolute\",\n          \
+    \  \"steps\": [\n              {\n                \"color\": \"green\",\n    \
+    \            \"value\": null\n              },\n              {\n            \
+    \    \"color\": \"yellow\",\n                \"value\": 30\n              },\n\
+    \              {\n                \"color\": \"red\",\n                \"value\"\
+    : 60\n              }\n            ]\n          },\n          \"unit\": \"ms\"\
+    \n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n    \
+    \    \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 12\n    \
+    \  },\n      \"id\": 3,\n      \"options\": {\n        \"orientation\": \"auto\"\
+    ,\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\
+    \n          ],\n          \"fields\": \"\",\n          \"values\": false\n   \
+    \     },\n        \"showThresholdLabels\": false,\n        \"showThresholdMarkers\"\
+    : true,\n        \"text\": {\n          \"valueSize\": null\n        }\n     \
+    \ },\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"histogram_quantile(0.50, sum(rate(vllm:time_to_first_token_seconds_bucket[5m]))\
+    \ by (le)) * 1000\",\n          \"legendFormat\": \"TTFT p50 (ms)\"\n        },\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket[5m]))\
+    \ by (le)) * 1000\",\n          \"legendFormat\": \"TTFT p95 (ms)\"\n        }\n\
+    \      ],\n      \"title\": \"Time to First Token (TTFT)\",\n      \"type\": \"\
+    gauge\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"custom\": {\n            \"axisLabel\"\
+    : \"Latency (ms)\",\n            \"drawStyle\": \"line\",\n            \"fillOpacity\"\
+    : 10,\n            \"gradientMode\": \"opacity\",\n            \"lineInterpolation\"\
+    : \"smooth\",\n            \"lineWidth\": 3,\n            \"showPoints\": \"never\"\
+    ,\n            \"spanNulls\": false\n          },\n          \"noValue\": \"0\"\
+    ,\n          \"unit\": \"ms\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 18,\n        \"x\": 6,\n\
+    \        \"y\": 12\n      },\n      \"id\": 4,\n      \"options\": {\n       \
+    \ \"legend\": {\n          \"calcs\": [\n            \"lastNotNull\",\n      \
+    \      \"p95\",\n            \"max\"\n          ],\n          \"displayMode\"\
+    : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\": true\n\
+    \        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n        \
+    \  \"sort\": \"none\"\n        }\n      },\n      \"targets\": [\n        {\n\
+    \          \"datasource\": \"Prometheus\",\n          \"expr\": \"histogram_quantile(0.50,\
+    \ sum(rate(vllm:time_to_first_token_seconds_bucket[5m])) by (le)) * 1000\",\n\
+    \          \"legendFormat\": \"Time to First Token (TTFT) p50\"\n        },\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket[5m]))\
+    \ by (le)) * 1000\",\n          \"legendFormat\": \"Time to First Token (TTFT)\
+    \ p95\"\n        },\n        {\n          \"datasource\": \"Prometheus\",\n  \
+    \        \"expr\": \"histogram_quantile(0.50, sum(rate(vllm:e2e_request_latency_seconds_bucket[5m]))\
+    \ by (le)) * 1000\",\n          \"legendFormat\": \"End-to-End Latency p50\"\n\
+    \        },\n        {\n          \"datasource\": \"Prometheus\",\n          \"\
+    expr\": \"histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket[5m]))\
+    \ by (le)) * 1000\",\n          \"legendFormat\": \"End-to-End Latency p95\"\n\
+    \        }\n      ],\n      \"title\": \"Inference Latency SLA (ms)\",\n     \
+    \ \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n\
+    \            \"mode\": \"thresholds\"\n          },\n          \"mappings\": [],\n\
+    \          \"max\": 100,\n          \"min\": 0,\n          \"noValue\": \"0\"\
+    ,\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n        \
+    \    \"steps\": [\n              {\n                \"color\": \"green\",\n  \
+    \              \"value\": null\n              },\n              {\n          \
+    \      \"color\": \"yellow\",\n                \"value\": 70\n              },\n\
+    \              {\n                \"color\": \"red\",\n                \"value\"\
+    : 85\n              }\n            ]\n          },\n          \"unit\": \"percent\"\
+    \n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n    \
+    \    \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 18\n    \
+    \  },\n      \"id\": 7,\n      \"options\": {\n        \"orientation\": \"auto\"\
+    ,\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\
+    \n          ],\n          \"fields\": \"\",\n          \"values\": false\n   \
+    \     },\n        \"showThresholdLabels\": false,\n        \"showThresholdMarkers\"\
+    : true,\n        \"text\": {\n          \"valueSize\": null\n        }\n     \
+    \ },\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"vllm:kv_cache_usage_perc * 100\",\n          \"legendFormat\"\
+    : \"KV Cache %\"\n        }\n      ],\n      \"title\": \"GPU KV Cache Capacity\
+    \ (%)\",\n      \"type\": \"gauge\"\n    },\n    {\n      \"datasource\": \"Prometheus\"\
+    ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"custom\": {\n\
+    \            \"axisLabel\": \"VRAM Pool\",\n            \"drawStyle\": \"line\"\
+    ,\n            \"fillOpacity\": 20,\n            \"gradientMode\": \"opacity\"\
+    ,\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\":\
+    \ 3,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false\n\
+    \          },\n          \"noValue\": \"0\",\n          \"unit\": \"bytes\"\n\
+    \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n     \
+    \   \"h\": 6,\n        \"w\": 18,\n        \"x\": 6,\n        \"y\": 18\n    \
+    \  },\n      \"id\": 8,\n      \"options\": {\n        \"legend\": {\n       \
+    \   \"calcs\": [\n            \"lastNotNull\",\n            \"max\"\n        \
+    \  ],\n          \"displayMode\": \"list\",\n          \"placement\": \"bottom\"\
+    ,\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n      \
+    \    \"mode\": \"multi\",\n          \"sort\": \"none\"\n        }\n      },\n\
+    \      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"sum(DCGM_FI_DEV_FB_USED) * 1024 * 1024\",\n          \"\
+    legendFormat\": \"VRAM Used\"\n        },\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_FB_USED + DCGM_FI_DEV_FB_FREE)\
+    \ * 1024 * 1024\",\n          \"legendFormat\": \"VRAM Total Pool (128GB)\"\n\
+    \        }\n      ],\n      \"title\": \"GPU Unified VRAM Allocation (GB)\",\n\
+    \      \"type\": \"timeseries\"\n    },\n    {\n      \"collapsed\": false,\n\
+    \      \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n\
+    \        \"y\": 24\n      },\n      \"id\": 102,\n      \"title\": \"Platform\
+    \ Infrastructure & Hardware Telemetry\",\n      \"type\": \"row\"\n    },\n  \
+    \  {\n      \"datasource\": \"Prometheus\",\n      \"fieldConfig\": {\n      \
+    \  \"defaults\": {\n          \"color\": {\n            \"mode\": \"thresholds\"\
+    \n          },\n          \"mappings\": [],\n          \"noValue\": \"0\",\n \
+    \         \"thresholds\": {\n            \"mode\": \"absolute\",\n           \
+    \ \"steps\": [\n              {\n                \"color\": \"green\",\n     \
+    \           \"value\": null\n              },\n              {\n             \
+    \   \"color\": \"yellow\",\n                \"value\": 60\n              },\n\
+    \              {\n                \"color\": \"red\",\n                \"value\"\
+    : 80\n              }\n            ]\n          },\n          \"unit\": \"celsius\"\
+    \n        },\n        \"overrides\": [\n          {\n            \"matcher\":\
+    \ {\n              \"id\": \"byName\",\n              \"options\": \"Power Draw\
+    \ (W)\"\n            },\n            \"properties\": [\n              {\n    \
+    \            \"id\": \"unit\",\n                \"value\": \"watt\"\n        \
+    \      },\n              {\n                \"id\": \"thresholds\",\n        \
+    \        \"value\": {\n                  \"mode\": \"absolute\",\n           \
+    \       \"steps\": [\n                    {\n                      \"color\":\
+    \ \"green\",\n                      \"value\": null\n                    },\n\
+    \                    {\n                      \"color\": \"yellow\",\n       \
+    \               \"value\": 400\n                    },\n                    {\n\
+    \                      \"color\": \"red\",\n                      \"value\": 600\n\
+    \                    }\n                  ]\n                }\n             \
+    \ }\n            ]\n          }\n        ]\n      },\n      \"gridPos\": {\n \
+    \       \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 25\n \
+    \     },\n      \"id\": 5,\n      \"options\": {\n        \"colorMode\": \"value\"\
+    ,\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"auto\",\n    \
+    \    \"orientation\": \"horizontal\",\n        \"reduceOptions\": {\n        \
+    \  \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\"\
+    : \"\",\n          \"values\": false\n        },\n        \"text\": {\n      \
+    \    \"valueSize\": null\n        },\n        \"textMode\": \"auto\"\n      },\n\
+    \      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"max(DCGM_FI_DEV_GPU_TEMP)\",\n          \"legendFormat\"\
+    : \"GPU Core Temp (\\u00b0C)\"\n        },\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_POWER_USAGE)\",\n   \
+    \       \"legendFormat\": \"Power Draw (W)\"\n        }\n      ],\n      \"title\"\
+    : \"GPU Core Temp & Power Draw\",\n      \"type\": \"stat\"\n    },\n    {\n \
+    \     \"datasource\": \"Prometheus\",\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"custom\": {\n            \"axisLabel\": \"Power (W)\",\n    \
+    \        \"drawStyle\": \"line\",\n            \"fillOpacity\": 15,\n        \
+    \    \"gradientMode\": \"opacity\",\n            \"lineInterpolation\": \"smooth\"\
+    ,\n            \"lineWidth\": 3,\n            \"showPoints\": \"never\",\n   \
+    \         \"spanNulls\": false\n          },\n          \"noValue\": \"0\",\n\
+    \          \"unit\": \"watt\"\n        },\n        \"overrides\": [\n        \
+    \  {\n            \"matcher\": {\n              \"id\": \"byName\",\n        \
+    \      \"options\": \"SM Compute Util %\"\n            },\n            \"properties\"\
+    : [\n              {\n                \"id\": \"custom.axisLabel\",\n        \
+    \        \"value\": \"Compute %\"\n              },\n              {\n       \
+    \         \"id\": \"custom.axisPlacement\",\n                \"value\": \"right\"\
+    \n              },\n              {\n                \"id\": \"unit\",\n     \
+    \           \"value\": \"percent\"\n              }\n            ]\n         \
+    \ }\n        ]\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
+    w\": 18,\n        \"x\": 6,\n        \"y\": 25\n      },\n      \"id\": 6,\n \
+    \     \"options\": {\n        \"legend\": {\n          \"calcs\": [\n        \
+    \    \"lastNotNull\",\n            \"max\"\n          ],\n          \"displayMode\"\
+    : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\": true\n\
+    \        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n        \
+    \  \"sort\": \"none\"\n        }\n      },\n      \"targets\": [\n        {\n\
+    \          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_POWER_USAGE)\"\
+    ,\n          \"legendFormat\": \"GPU Power Draw (W)\"\n        },\n        {\n\
+    \          \"datasource\": \"Prometheus\",\n          \"expr\": \"avg(DCGM_FI_DEV_GPU_UTIL)\"\
+    ,\n          \"legendFormat\": \"SM Compute Util %\"\n        }\n      ],\n  \
+    \    \"title\": \"GPU Power Draw (W) & SM Compute Utilization (%)\",\n      \"\
+    type\": \"timeseries\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n \
+    \           \"mode\": \"thresholds\"\n          },\n          \"mappings\": [\n\
+    \            {\n              \"options\": {\n                \"0\": {\n     \
+    \             \"color\": \"red\",\n                  \"text\": \"DOWN\"\n    \
+    \            },\n                \"1\": {\n                  \"color\": \"green\"\
+    ,\n                  \"text\": \"ONLINE\"\n                }\n              },\n\
+    \              \"type\": \"value\"\n            }\n          ],\n          \"\
+    noValue\": \"0\",\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+    ,\n            \"steps\": [\n              {\n                \"color\": \"red\"\
+    ,\n                \"value\": null\n              },\n              {\n      \
+    \          \"color\": \"green\",\n                \"value\": 1\n             \
+    \ }\n            ]\n          }\n        },\n        \"overrides\": []\n     \
+    \ },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\"\
+    : 0,\n        \"y\": 31\n      },\n      \"id\": 9,\n      \"options\": {\n  \
+    \      \"colorMode\": \"background\",\n        \"graphMode\": \"none\",\n    \
+    \    \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n        \"\
+    reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n    \
+    \      ],\n          \"fields\": \"\",\n          \"values\": false\n        },\n\
+    \        \"text\": {\n          \"valueSize\": null\n        },\n        \"textMode\"\
+    : \"auto\"\n      },\n      \"targets\": [\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"up{job=\\\"haze-nemotron\\\"}\",\n  \
+    \        \"legendFormat\": \"Sovereign AI Engine (GPU)\"\n        },\n       \
+    \ {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"up{job=\\\
+    \"litellm\\\"}\",\n          \"legendFormat\": \"AI Routing Gateway\"\n      \
+    \  }\n      ],\n      \"title\": \"Core Infrastructure Status\",\n      \"type\"\
+    : \"stat\"\n    },\n    {\n      \"datasource\": \"Prometheus\",\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"custom\": {\n            \"axisLabel\"\
+    : \"CPU Cores\",\n            \"drawStyle\": \"line\",\n            \"fillOpacity\"\
+    : 15,\n            \"gradientMode\": \"opacity\",\n            \"lineInterpolation\"\
+    : \"smooth\",\n            \"lineWidth\": 3,\n            \"showPoints\": \"never\"\
+    ,\n            \"spanNulls\": false\n          },\n          \"noValue\": \"0\"\
+    ,\n          \"unit\": \"short\"\n        },\n        \"overrides\": [\n     \
+    \     {\n            \"matcher\": {\n              \"id\": \"byName\",\n     \
+    \         \"options\": \"RAM Working Set (GB)\"\n            },\n            \"\
+    properties\": [\n              {\n                \"id\": \"custom.axisLabel\"\
+    ,\n                \"value\": \"RAM (GB)\"\n              },\n              {\n\
+    \                \"id\": \"custom.axisPlacement\",\n                \"value\"\
+    : \"right\"\n              },\n              {\n                \"id\": \"unit\"\
+    ,\n                \"value\": \"decgbytes\"\n              }\n            ]\n\
+    \          }\n        ]\n      },\n      \"gridPos\": {\n        \"h\": 6,\n \
+    \       \"w\": 18,\n        \"x\": 6,\n        \"y\": 31\n      },\n      \"id\"\
+    : 10,\n      \"options\": {\n        \"legend\": {\n          \"calcs\": [\n \
+    \           \"lastNotNull\",\n            \"max\"\n          ],\n          \"\
+    displayMode\": \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+    : true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n \
+    \         \"sort\": \"none\"\n        }\n      },\n      \"targets\": [\n    \
+    \    {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(rate(container_cpu_usage_seconds_total{container!=\\\
+    \"\\\"}[5m]))\",\n          \"legendFormat\": \"CPU Cores\"\n        },\n    \
+    \    {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(container_memory_working_set_bytes{container!=\\\
+    \"\\\"}) / 1024 / 1024 / 1024\",\n          \"legendFormat\": \"RAM Working Set\
+    \ (GB)\"\n        }\n      ],\n      \"title\": \"Platform CPU & Memory Working\
+    \ Set\",\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"refresh\": \"10s\"\
+    ,\n  \"schemaVersion\": 38,\n  \"style\": \"dark\",\n  \"tags\": [\n    \"executive\"\
+    ,\n    \"scai\",\n    \"sovereign\",\n    \"overview\"\n  ],\n  \"time\": {\n\
+    \    \"from\": \"now-1h\",\n    \"to\": \"now\"\n  },\n  \"title\": \"Executive\
+    \ Pilot Combo Dashboard\",\n  \"uid\": \"executive-pilot-overview\"\n}\n"
+  haze-dashboard.json: "{\n  \"annotations\": {\n    \"list\": []\n  },\n  \"editable\"\
+    : true,\n  \"fiscalYearStartMonth\": 0,\n  \"graphTooltip\": 0,\n  \"id\": null,\n\
+    \  \"links\": [],\n  \"liveNow\": false,\n  \"panels\": [\n    {\n      \"collapsed\"\
+    : false,\n      \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n      \
+    \  \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 100,\n      \"title\"\
+    : \"Hardware & System Telemetry\",\n      \"type\": \"row\"\n    },\n    {\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\
+    ,\n          \"unit\": \"percent\"\n        },\n        \"overrides\": []\n  \
+    \    },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
+    x\": 0,\n        \"y\": 1\n      },\n      \"id\": 8,\n      \"title\": \"Hardware\
+    \ GPU Utilization (%)\",\n      \"type\": \"gauge\",\n      \"targets\": [\n \
+    \       {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"avg(DCGM_FI_DEV_GPU_UTIL{node=\\\
+    \"haze\\\"})\",\n          \"legendFormat\": \"GPU Util %\"\n        }\n     \
+    \ ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n      \
+    \    \"noValue\": \"0\",\n          \"unit\": \"bytes\"\n        },\n        \"\
+    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
+    w\": 6,\n        \"x\": 6,\n        \"y\": 1\n      },\n      \"id\": 9,\n   \
+    \   \"title\": \"Hardware GPU Memory\",\n      \"type\": \"timeseries\",\n   \
+    \   \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n   \
+    \       \"expr\": \"sum(DCGM_FI_DEV_FB_USED{node=\\\"haze\\\"}) * 1024 * 1024\"\
+    ,\n          \"legendFormat\": \"VRAM Used\"\n        },\n        {\n        \
+    \  \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_FB_USED{node=\\\
+    \"haze\\\"} + DCGM_FI_DEV_FB_FREE{node=\\\"haze\\\"}) * 1024 * 1024\",\n     \
+    \     \"legendFormat\": \"VRAM Total\"\n        }\n      ]\n    },\n    {\n  \
+    \    \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\
+    ,\n          \"unit\": \"celsius\"\n        },\n        \"overrides\": []\n  \
+    \    },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
+    x\": 12,\n        \"y\": 1\n      },\n      \"id\": 10,\n      \"title\": \"Hardware\
+    \ GPU Temperature (\\u00b0C)\",\n      \"type\": \"timeseries\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
+    : \"max(DCGM_FI_DEV_GPU_TEMP{node=\\\"haze\\\"})\",\n          \"legendFormat\"\
+    : \"GPU Temp \\u00b0C\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"noValue\": \"0\",\n          \"unit\"\
+    : \"watt\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\":\
+    \ 1\n      },\n      \"id\": 11,\n      \"title\": \"Hardware GPU Power Draw (W)\"\
+    ,\n      \"type\": \"timeseries\",\n      \"targets\": [\n        {\n        \
+    \  \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(DCGM_FI_DEV_POWER_USAGE{node=\\\
+    \"haze\\\"})\",\n          \"legendFormat\": \"Power Draw (W)\"\n        }\n \
+    \     ]\n    },\n    {\n      \"collapsed\": false,\n      \"gridPos\": {\n  \
+    \      \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n        \"y\": 7\n  \
+    \    },\n      \"id\": 102,\n      \"title\": \"Nemotron 49B\",\n      \"type\"\
+    : \"row\"\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n\
+    \          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"x\": 0,\n\
+    \        \"y\": 8\n      },\n      \"id\": 20,\n      \"title\": \"Nemotron 49B\
+    \ Active Running Requests\",\n      \"type\": \"stat\",\n      \"targets\": [\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    vllm:num_requests_running{node=\\\"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
+    \"} or vllm:num_requests_running{node=\\\"haze\\\"}\",\n          \"legendFormat\"\
+    : \"Running\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n \
+    \       \"defaults\": {\n          \"noValue\": \"0\"\n        },\n        \"\
+    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
+    w\": 6,\n        \"x\": 6,\n        \"y\": 8\n      },\n      \"id\": 21,\n  \
+    \    \"title\": \"Nemotron 49B Queued Waiting Requests\",\n      \"type\": \"\
+    stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"vllm:num_requests_waiting{node=\\\"haze\\\",model_name=~\\\
+    \"(?i).*nemotron.*\\\"} or vllm:num_requests_waiting{node=\\\"haze\\\"}\",\n \
+    \         \"legendFormat\": \"Waiting\"\n        }\n      ]\n    },\n    {\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\
+    ,\n          \"unit\": \"percent\"\n        },\n        \"overrides\": []\n  \
+    \    },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n        \"\
+    x\": 12,\n        \"y\": 8\n      },\n      \"id\": 22,\n      \"title\": \"Nemotron\
+    \ 49B GPU KV Cache Usage (%)\",\n      \"type\": \"gauge\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
+    : \"(vllm:kv_cache_usage_perc{node=\\\"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
+    \"} or vllm:kv_cache_usage_perc{node=\\\"haze\\\"}) * 100\",\n          \"legendFormat\"\
+    : \"KV Cache %\"\n        }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n\
+    \        \"defaults\": {\n          \"noValue\": \"0\"\n        },\n        \"\
+    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
+    w\": 6,\n        \"x\": 18,\n        \"y\": 8\n      },\n      \"id\": 23,\n \
+    \     \"title\": \"Nemotron 49B Completed Requests Total\",\n      \"type\": \"\
+    stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"vllm:request_success_total{node=\\\"haze\\\",model_name=~\\\
+    \"(?i).*nemotron.*\\\"} or vllm:request_success_total{node=\\\"haze\\\"}\",\n\
+    \          \"legendFormat\": \"Success Total\"\n        }\n      ]\n    },\n \
+    \   {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
+    : \"0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
+    \        \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 14\n\
+    \      },\n      \"id\": 24,\n      \"title\": \"Nemotron 49B Token Generation\
+    \ & Ingestion Speed (tokens/s)\",\n      \"type\": \"timeseries\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": \"Prometheus\",\n          \"expr\"\
+    : \"sum(rate(vllm:generation_tokens_total{node=\\\"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\
+    \"}[1m])) or sum(rate(vllm:generation_tokens_total{node=\\\"haze\\\"}[1m]))\"\
+    ,\n          \"legendFormat\": \"Gen Tokens/s\"\n        },\n        {\n     \
+    \     \"datasource\": \"Prometheus\",\n          \"expr\": \"sum(rate(vllm:prompt_tokens_total{node=\\\
+    \"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[1m])) or sum(rate(vllm:prompt_tokens_total{node=\\\
+    \"haze\\\"}[1m]))\",\n          \"legendFormat\": \"Prompt Tokens/s\"\n      \
+    \  }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\":\
+    \ {\n          \"noValue\": \"0\"\n        },\n        \"overrides\": []\n   \
+    \   },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"\
+    x\": 12,\n        \"y\": 14\n      },\n      \"id\": 25,\n      \"title\": \"\
+    Nemotron 49B Native Tool Call Parser Invocations\",\n      \"type\": \"timeseries\"\
+    ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"vllm:tool_call_parser_invocations_total{node=\\\"haze\\\
+    \",model_name=~\\\"(?i).*nemotron.*\\\"} or vllm:tool_call_parser_invocations_total{node=\\\
+    \"haze\\\"}\",\n          \"legendFormat\": \"{{parser}} Invocations\"\n     \
+    \   }\n      ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"noValue\": \"0\",\n          \"unit\": \"ms\"\n        },\n \
+    \       \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 8,\n\
+    \        \"w\": 24,\n        \"x\": 0,\n        \"y\": 22\n      },\n      \"\
+    id\": 26,\n      \"title\": \"Nemotron 49B Request Latency p95 (ms)\",\n     \
+    \ \"type\": \"timeseries\",\n      \"targets\": [\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\
+    \"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
+    \ sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
+    \ (le))) * 1000\",\n          \"legendFormat\": \"End-to-End Latency p95 ms\"\n\
+    \        },\n        {\n          \"datasource\": \"Prometheus\",\n          \"\
+    expr\": \"(histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\
+    \"haze\\\",model_name=~\\\"(?i).*nemotron.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
+    \ sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
+    \ (le))) * 1000\",\n          \"legendFormat\": \"Time to First Token (TTFT) p95\
+    \ ms\"\n        }\n      ]\n    },\n    {\n      \"collapsed\": false,\n     \
+    \ \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n \
+    \       \"y\": 30\n      },\n      \"id\": 103,\n      \"title\": \"Llama 3.3\
+    \ 70B\",\n      \"type\": \"row\"\n    },\n    {\n      \"fieldConfig\": {\n \
+    \       \"defaults\": {\n          \"noValue\": \"0\"\n        },\n        \"\
+    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"\
+    w\": 6,\n        \"x\": 0,\n        \"y\": 31\n      },\n      \"id\": 30,\n \
+    \     \"title\": \"Llama 3.3 70B Active Running Requests\",\n      \"type\": \"\
+    stat\",\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\"\
+    ,\n          \"expr\": \"vllm:num_requests_running{node=\\\"haze\\\",model_name=~\\\
+    \"(?i).*llama.*\\\"} or vllm:num_requests_running{node=\\\"haze\\\"}\",\n    \
+    \      \"legendFormat\": \"Running\"\n        }\n      ]\n    },\n    {\n    \
+    \  \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"0\"\n\
+    \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n     \
+    \   \"h\": 6,\n        \"w\": 6,\n        \"x\": 6,\n        \"y\": 31\n     \
+    \ },\n      \"id\": 31,\n      \"title\": \"Llama 3.3 70B Queued Waiting Requests\"\
+    ,\n      \"type\": \"stat\",\n      \"targets\": [\n        {\n          \"datasource\"\
+    : \"Prometheus\",\n          \"expr\": \"vllm:num_requests_waiting{node=\\\"haze\\\
+    \",model_name=~\\\"(?i).*llama.*\\\"} or vllm:num_requests_waiting{node=\\\"haze\\\
+    \"}\",\n          \"legendFormat\": \"Waiting\"\n        }\n      ]\n    },\n\
+    \    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
+    : \"0\",\n          \"unit\": \"percent\"\n        },\n        \"overrides\":\
+    \ []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 6,\n \
+    \       \"x\": 12,\n        \"y\": 31\n      },\n      \"id\": 32,\n      \"title\"\
+    : \"Llama 3.3 70B GPU KV Cache Usage (%)\",\n      \"type\": \"gauge\",\n    \
+    \  \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n    \
+    \      \"expr\": \"(vllm:kv_cache_usage_perc{node=\\\"haze\\\",model_name=~\\\"\
+    (?i).*llama.*\\\"} or vllm:kv_cache_usage_perc{node=\\\"haze\\\"}) * 100\",\n\
+    \          \"legendFormat\": \"KV Cache %\"\n        }\n      ]\n    },\n    {\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\": \"\
+    0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n \
+    \       \"h\": 6,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\": 31\n\
+    \      },\n      \"id\": 33,\n      \"title\": \"Llama 3.3 70B Completed Requests\
+    \ Total\",\n      \"type\": \"stat\",\n      \"targets\": [\n        {\n     \
+    \     \"datasource\": \"Prometheus\",\n          \"expr\": \"vllm:request_success_total{node=\\\
+    \"haze\\\",model_name=~\\\"(?i).*llama.*\\\"} or vllm:request_success_total{node=\\\
+    \"haze\\\"}\",\n          \"legendFormat\": \"Success Total\"\n        }\n   \
+    \   ]\n    },\n    {\n      \"fieldConfig\": {\n        \"defaults\": {\n    \
+    \      \"noValue\": \"0\"\n        },\n        \"overrides\": []\n      },\n \
+    \     \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n\
+    \        \"y\": 37\n      },\n      \"id\": 34,\n      \"title\": \"Llama 3.3\
+    \ 70B Token Generation & Ingestion Speed (tokens/s)\",\n      \"type\": \"timeseries\"\
+    ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"sum(rate(vllm:generation_tokens_total{node=\\\"haze\\\"\
+    ,model_name=~\\\"(?i).*llama.*\\\"}[1m])) or sum(rate(vllm:generation_tokens_total{node=\\\
+    \"haze\\\"}[1m]))\",\n          \"legendFormat\": \"Gen Tokens/s\"\n        },\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    sum(rate(vllm:prompt_tokens_total{node=\\\"haze\\\",model_name=~\\\"(?i).*llama.*\\\
+    \"}[1m])) or sum(rate(vllm:prompt_tokens_total{node=\\\"haze\\\"}[1m]))\",\n \
+    \         \"legendFormat\": \"Prompt Tokens/s\"\n        }\n      ]\n    },\n\
+    \    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
+    : \"0\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
+    \        \"h\": 8,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 37\n\
+    \      },\n      \"id\": 35,\n      \"title\": \"Llama 3.3 70B Native Tool Call\
+    \ Parser Invocations\",\n      \"type\": \"timeseries\",\n      \"targets\": [\n\
+    \        {\n          \"datasource\": \"Prometheus\",\n          \"expr\": \"\
+    vllm:tool_call_parser_invocations_total{node=\\\"haze\\\",model_name=~\\\"(?i).*llama.*\\\
+    \"} or vllm:tool_call_parser_invocations_total{node=\\\"haze\\\"}\",\n       \
+    \   \"legendFormat\": \"{{parser}} Invocations\"\n        }\n      ]\n    },\n\
+    \    {\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"noValue\"\
+    : \"0\",\n          \"unit\": \"ms\"\n        },\n        \"overrides\": []\n\
+    \      },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 24,\n     \
+    \   \"x\": 0,\n        \"y\": 45\n      },\n      \"id\": 36,\n      \"title\"\
+    : \"Llama 3.3 70B Request Latency p95 (ms)\",\n      \"type\": \"timeseries\"\
+    ,\n      \"targets\": [\n        {\n          \"datasource\": \"Prometheus\",\n\
+    \          \"expr\": \"(histogram_quantile(0.95, sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\
+    \"haze\\\",model_name=~\\\"(?i).*llama.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
+    \ sum(rate(vllm:e2e_request_latency_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
+    \ (le))) * 1000\",\n          \"legendFormat\": \"End-to-End Latency p95 ms\"\n\
+    \        },\n        {\n          \"datasource\": \"Prometheus\",\n          \"\
+    expr\": \"(histogram_quantile(0.95, sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\
+    \"haze\\\",model_name=~\\\"(?i).*llama.*\\\"}[5m])) by (le)) or histogram_quantile(0.95,\
+    \ sum(rate(vllm:time_to_first_token_seconds_bucket{node=\\\"haze\\\"}[5m])) by\
+    \ (le))) * 1000\",\n          \"legendFormat\": \"Time to First Token (TTFT) p95\
+    \ ms\"\n        }\n      ]\n    }\n  ],\n  \"refresh\": \"10s\",\n  \"schemaVersion\"\
+    : 38,\n  \"style\": \"dark\",\n  \"tags\": [\n    \"haze\",\n    \"gx10\",\n \
+    \   \"vllm\",\n    \"llama33\",\n    \"nemotron\",\n    \"ai\"\n  ],\n  \"time\"\
+    : {\n    \"from\": \"now-30m\",\n    \"to\": \"now\"\n  },\n  \"title\": \"Colt\
+    \ GPU-01 & Nemotron-49B Inference Overview\",\n  \"uid\": \"haze-gx10-inference-overview\"\
+    \n}"

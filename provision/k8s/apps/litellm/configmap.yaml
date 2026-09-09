@@ -27,6 +27,14 @@ data:
     litellm_settings:
       drop_params: true
       telemetry: false
+      callbacks: ["prometheus"]
+      require_auth_for_metrics_endpoint: false
+      allow_unauthenticated_metrics: true
+
+    general_settings:
+      master_key: "os.environ/LITELLM_MASTER_KEY"
+      background_health_checks: true
+      allow_unauthenticated_metrics: true
 
     router_settings:
       routing_strategy: simple-shuffle
