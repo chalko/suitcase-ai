@@ -15,17 +15,14 @@ data:
       exit 1
     fi
 
-    # 1. Dynamically configure rclone
+    # 1. Dynamically configure rclone for Shared Drive folder
     export RCLONE_CONFIG_GDRIVE_TYPE="drive"
     export RCLONE_CONFIG_GDRIVE_SCOPE="drive"
     export RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_FILE="/etc/gdrive/sa.json"
-    
-    # Optional folder ID if specified, else root-relative path
-    if [ -n "${GDRIVE_ROOT_FOLDER_ID:-}" ]; then
-      export RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID="${GDRIVE_ROOT_FOLDER_ID}"
-    fi
+    export RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID="${GDRIVE_ROOT_FOLDER_ID:-1UwUvqwyIFOlHJ8W8EtaHFKpR4RvkZALF}"
+    export RCLONE_CONFIG_GDRIVE_SERVER_SIDE_ACROSS_CONFIGS="true"
 
-    REMOTE_BASE="gdrive:Backups/CampColt/Gitea"
+    REMOTE_BASE="gdrive:"
     DUMP_FILE=$(ls -t /backup/gitea-dump-*.zip | head -n1)
     SHA_FILE="${DUMP_FILE}.sha256"
 
