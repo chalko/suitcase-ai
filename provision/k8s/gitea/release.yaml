@@ -33,7 +33,7 @@ spec:
   values:
     image:
       repository: gitea/gitea
-      tag: "1.22.6-rootless"
+      tag: "1.22.6"
       rootless: true
     gitea:
       admin:
@@ -68,9 +68,13 @@ spec:
           REQUIRE_SIGNIN_VIEW: false
         lfs:
           PATH: "/data/git/lfs"
+        actions:
+          ENABLED: true
     persistence:
       enabled: true
+      claimName: gitea-data
       existingClaim: gitea-data
+      size: 20Gi
       mountPath: /data
     redis-cluster:
       enabled: false
