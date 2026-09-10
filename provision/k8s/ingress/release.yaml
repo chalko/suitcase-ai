@@ -32,6 +32,8 @@ spec:
       retries: 3
   values:
     controller:
+      extraArgs:
+        default-ssl-certificate: "ingress-nginx/colt-chalko-wildcard-tls"
       image:
         tag: "v1.12.0"
       nodeSelector:
