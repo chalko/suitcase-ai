@@ -71,7 +71,7 @@ spec:
         actions:
           ENABLED: "true"
     actions:
-      enabled: true
+      enabled: false
     persistence:
       enabled: true
       claimName: gitea-data
