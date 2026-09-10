@@ -4,9 +4,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - pvc.yaml
-  - configmap.yaml
-  - deployment.yaml
-  - service.yaml
-  - ingress.yaml
+  - release.yaml
   - runner-configmap.yaml
   - runner.yaml

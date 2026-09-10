@@ -1,0 +1,102 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: gitea-charts
+  namespace: gitea
+spec:
+  interval: 1h
+  url: https://dl.gitea.com/charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gitea
+  namespace: gitea
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: gitea
+      version: "10.6.0"
+      sourceRef:
+        kind: HelmRepository
+        name: gitea-charts
+        namespace: gitea
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    image:
+      repository: gitea/gitea
+      tag: "1.22.6-rootless"
+      rootless: true
+    gitea:
+      admin:
+        existingSecret: gitea-admin-secret
+      config:
+        APP_NAME: "Camp Colt Sovereign Git Forge"
+        RUN_USER: "git"
+        RUN_MODE: "prod"
+        database:
+          DB_TYPE: "sqlite3"
+          PATH: "/data/gitea/gitea.db"
+        repository:
+          ROOT: "/data/git/repositories"
+          DEFAULT_BRANCH: "main"
+        server:
+          SSH_DOMAIN: "10.82.0.13"
+          DOMAIN: "gitea.colt.internal"
+          HTTP_PORT: 3000
+          ROOT_URL: "http://gitea.colt.internal/"
+          DISABLE_SSH: false
+          SSH_PORT: 2222
+          SSH_LISTEN_PORT: 2222
+          START_SSH_SERVER: true
+          LFS_START_SERVER: true
+        security:
+          INSTALL_LOCK: true
+          SECRET_KEY: "66c30f781df038cbb2c73335b1d9bf16c878415df84b648bc1bfdb10aee7"
+          INTERNAL_TOKEN: "eU94QkxEQnFvczR2SjJjVk4yNUt0M2Vub0ZkNW9hR2E="
+        service:
+          DISABLE_REGISTRATION: true
+          ALLOW_ONLY_EXTERNAL_REGISTRATION: false
+          REQUIRE_SIGNIN_VIEW: false
+        lfs:
+          PATH: "/data/git/lfs"
+    persistence:
+      enabled: true
+      existingClaim: gitea-data
+      mountPath: /data
+    redis-cluster:
+      enabled: false
+    postgresql:
+      enabled: false
+    postgresql-ha:
+      enabled: false
+    nodeSelector:
+      kubernetes.io/arch: amd64
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/proxy-body-size: "1024m"
+      hosts:
+        - host: gitea.colt.chalko.com
+          paths:
+            - path: /
+              pathType: Prefix
+        - host: gitea.colt.internal
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: colt-chalko-wildcard-tls
+          hosts:
+            - gitea.colt.chalko.com
+            - gitea.colt.internal
