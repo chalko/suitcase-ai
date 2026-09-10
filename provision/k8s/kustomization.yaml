@@ -5,7 +5,7 @@ resources:
   - storage/local-path-storage.yaml
   - metallb
   - apps/dns
-  - ingress/ingress-nginx.yaml
+  - ingress
   - vault/vault-auth-rbac.yaml
   - gitea
   - nvidia
