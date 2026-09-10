@@ -40,12 +40,12 @@ within the Suitcase AI initiative.
    - Never commit private keys, tokens, or credential JSON files to git.
      Maintain strict `.gitignore` rules.
 
-3. **Operational Segregation:**
+3. **Operational Segregation & Rig Isolation:**
 
-   - Camp Colt operates on the `10.82.0.0/16` appliance network (gateway `10.82.0.1`).
-   - Hypervisor allocations for legacy Fog workloads (`provision/fog/`) are
-     strictly segregated at the resource boundary on VLAN 613; in-guest OS configurations
-     are managed externally.
+   - Camp Colt operates strictly on the `10.82.0.0/16` appliance network (gateway `10.82.0.1`, Kubernetes control plane `10.82.0.10:6443`).
+   - **MANDATORY KUBECONFIG PINNING:** Never run `kubectl` or `flux` without explicitly setting `KUBECONFIG="$REPO_ROOT/colt-kubeconfig"` (or sourcing `scripts/load_colt_env.sh`). All subagents and automated tasks MUST be passed explicit `--kubeconfig` paths or have `KUBECONFIG` pre-set.
+   - **ZERO FOREIGN RIG MUTATION:** Never reference, target, or execute mutating commands against external rigs (such as Fog on `10.7.82.0/24` or contexts like `admin@talos-k8s-cluster`). Run `scripts/verify-colt-context.sh` before executing cluster operations to guarantee context safety.
+   - Hypervisor allocations for legacy Fog workloads (`provision/fog/`) are strictly segregated at the resource boundary on VLAN 613; in-guest OS configurations are managed externally.
 
 4. **Verification & Live Validation Before Task Completion:**
 

@@ -17,6 +17,11 @@ export VAULT_SKIP_VERIFY="true"
 export PROXMOX_VE_ENDPOINT="https://10.82.0.2:8006/"
 export PROXMOX_VE_INSECURE="true"
 
+# Rig Isolation: Force KUBECONFIG to Camp Colt cluster config
+if [ -f "$REPO_ROOT/colt-kubeconfig" ]; then
+    export KUBECONFIG="$REPO_ROOT/colt-kubeconfig"
+fi
+
 # Point to Camp Colt client certificate & private key for TLS cert auth
 export VAULT_CLIENT_CERT="$REPO_ROOT/agent-keys/agents/colt-sysadmin/colt-sysadmin_tls.crt"
 export VAULT_CLIENT_KEY="$REPO_ROOT/agent-keys/agents/colt-sysadmin/colt-sysadmin_tls.key"
