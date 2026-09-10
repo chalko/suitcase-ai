@@ -31,6 +31,8 @@ spec:
     remediation:
       retries: 3
   values:
+    strategy:
+      type: Recreate
     image:
       repository: gitea/gitea
       tag: "1.22.6"
