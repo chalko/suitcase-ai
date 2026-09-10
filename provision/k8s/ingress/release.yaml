@@ -36,6 +36,9 @@ spec:
         tag: "v1.12.0"
       nodeSelector:
         kubernetes.io/arch: amd64
+      hostPort:
+        enabled: false
+      enableProfiling: false
       service:
         annotations:
           metallb.universe.tf/address-pool: colt-ingress-pool
