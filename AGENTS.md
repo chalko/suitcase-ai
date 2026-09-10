@@ -57,3 +57,10 @@ within the Suitcase AI initiative.
      before declaring the task complete.
    - **Pre-flight Checks:** Always run pre-flight syntax checks, dry-run plans (`terraform plan`,
      `kubectl --dry-run=client`), and network verifications before committing changes.
+
+5. **Planning & Artifact Delivery:**
+
+   - **Artifact Delivery for Large Plans:** If an implementation plan, architectural specification,
+     or design proposal exceeds 40 lines, you MUST share it as an artifact document
+     (written to `<appDataDir>/brain/<conversation-id>/`) and point the user to the artifact rather
+     than emitting the entire long text directly in the chat.
