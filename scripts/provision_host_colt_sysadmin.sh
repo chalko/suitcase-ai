@@ -25,7 +25,6 @@ mkdir -p /etc/ssh/auth_principals
 cat << 'EOF' > /etc/ssh/auth_principals/colt-sysadmin-agent
 colt-sysadmin-agent
 colt-sysadmin
-sysadmin-agent
 EOF
 chmod 644 /etc/ssh/auth_principals/colt-sysadmin-agent
 echo "[✓] Configured /etc/ssh/auth_principals/colt-sysadmin-agent"
