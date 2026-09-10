@@ -25,7 +25,7 @@ spec:
             kubernetes.io/arch: amd64
           initContainers:
             - name: vault-snapshot
-              image: curlimages/curl:8.10.1
+              image: hashicorp/vault:1.18.4
               imagePullPolicy: IfNotPresent
               securityContext:
                 runAsUser: 1000
@@ -36,28 +36,20 @@ spec:
                 - |
                   set -euo pipefail
                   echo "[+] Authenticating to HashiCorp Vault via Kubernetes Auth..."
+                  export VAULT_ADDR="https://10.82.0.5:8200"
+                  export VAULT_SKIP_VERIFY="true"
+                  
                   K8S_JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                  VAULT_TOKEN=$(vault write -field=token auth/kubernetes/login role=vault-backup jwt="${K8S_JWT}")
+                  export VAULT_TOKEN
                   
-                  # Login to Vault via K8s Auth Backend
-                  LOGIN_RESP=$(curl -s -k --request POST \
-                    --data "{\"role\": \"vault-backup\", \"jwt\": \"${K8S_JWT}\"}" \
-                    https://10.82.0.5:8200/v1/auth/kubernetes/login)
-                  
-                  VAULT_TOKEN=$(echo "${LOGIN_RESP}" | sed -n 's/.*"client_token":"\([^"]*\)".*/\1/p')
-                  
-                  if [ -z "${VAULT_TOKEN}" ]; then
-                    echo "[-] ERROR: Failed to obtain Vault token from Kubernetes login response:"
-                    echo "${LOGIN_RESP}"
-                    exit 1
-                  fi
                   echo "[+] Successfully acquired Vault client token."
 
                   DATE_TAG=$(date +%Y%m%d_%H%M%S)
                   SNAP_NAME="vault-raft-${DATE_TAG}.snap"
                   
                   echo "[+] Taking live atomic Raft snapshot to /backup/${SNAP_NAME}..."
-                  curl -s -k -f -H "X-Vault-Token: ${VAULT_TOKEN}" \
-                    https://10.82.0.5:8200/v1/sys/storage/raft/snapshot -o "/backup/${SNAP_NAME}"
+                  vault operator raft snapshot save "/backup/${SNAP_NAME}"
                   
                   echo "[+] Computing SHA256 checksum..."
                   cd /backup
