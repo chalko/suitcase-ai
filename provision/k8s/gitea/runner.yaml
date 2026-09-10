@@ -75,7 +75,7 @@ spec:
               exec act_runner daemon --config /config/config.yaml
           env:
             - name: GITEA_INSTANCE_URL
-              value: "http://gitea-http.gitea.svc.cluster.local:3000"
+              value: "http://gitea.gitea.svc.cluster.local:3000"
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
