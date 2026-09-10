@@ -1,0 +1,32 @@
+---
+# tasks file for hypervisor_storage
+
+- name: Ensure Fog Gitea backup ZFS dataset exists with quota and sharenfs
+  community.general.zfs:
+    name: local-fast-zfs/fog/backups/gitea
+    state: present
+    extra_zfs_properties:
+      quota: 100G
+      sharenfs: "rw=@10.7.82.15:10.7.82.16:@10.7.82.0/24,all_squash,anonuid=1000,anongid=1000,async,no_subtree_check"
+
+- name: Ensure Fog Gitea backup mount directory permissions and ownership
+  ansible.builtin.file:
+    path: /local-fast-zfs/fog/backups/gitea
+    owner: "1000"
+    group: "1000"
+    mode: "0775"
+    state: directory
+
+- name: Ensure parent backup directory exists
+  ansible.builtin.file:
+    path: /local-fast-zfs/backups
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure legacy compatibility symlink exists for Fog Gitea backups
+  ansible.builtin.file:
+    src: /local-fast-zfs/fog/backups/gitea
+    dest: /local-fast-zfs/backups/gitea
+    state: link

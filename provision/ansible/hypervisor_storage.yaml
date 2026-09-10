@@ -1,0 +1,6 @@
+---
+- name: Configure Hypervisor ZFS Storage and NFS Exports
+  hosts: colt_hypervisors
+  become: true
+  roles:
+    - hypervisor_storage
