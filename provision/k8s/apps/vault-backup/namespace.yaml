@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vault-backup
+  labels:
+    app.kubernetes.io/name: vault-backup
+    app.kubernetes.io/part-of: camp-colt
