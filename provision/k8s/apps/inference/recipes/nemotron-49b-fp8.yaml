@@ -12,7 +12,7 @@ spec:
     source: "ngc"
   runtime:
     engine: "nim"
-    image: "nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5:24.12.01"
+    image: "nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1.5@sha256:802b13db0cd0d447efc043b5121dd87d506ff8dfdcf513c5c5ecf0b0f382c8a5"
     profile: "498e09394f7016bb2f08d830e3da8ad03dcf7b027a227d57f397cc69682f05c8"
     gpuMemoryUtilization: 0.75
     maxNumSeqs: 64
