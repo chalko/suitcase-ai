@@ -12,7 +12,7 @@ spec:
     source: "huggingface"
   runtime:
     engine: "vllm"
-    image: "ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest"
+    image: "ghcr.io/spark-arena/dgx-vllm-eugr-nightly:24.12.01"
     gpuMemoryUtilization: 0.70
     maxNumSeqs: 128
     maxModelLen: 16384

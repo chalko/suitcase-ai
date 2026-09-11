@@ -117,7 +117,7 @@ spec:
               memory: "256Mi"
       containers:
         - name: north-mini-code-nvfp4-engine
-          image: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:latest
+          image: ghcr.io/spark-arena/dgx-vllm-eugr-nightly:24.12.01
           imagePullPolicy: IfNotPresent
           command:
             - python3
