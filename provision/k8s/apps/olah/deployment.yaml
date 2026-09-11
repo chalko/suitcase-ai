@@ -17,27 +17,28 @@ spec:
       labels:
         app: olah
     spec:
+      automountServiceAccountToken: false
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
         - name: olah
-          image: python:3.11-slim
+          image: harbor.colt.chalko.com/colt/olah:v0.1.18
           imagePullPolicy: IfNotPresent
-          command:
-            - /bin/sh
-            - -c
-            - |
-              set -euo pipefail
-              apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
-              pip install --no-cache-dir olah
-              exec olah-cli \
-                --repos-path /data/cache \
-                --cache-size-limit 15GB \
-                --cache-clean-strategy LRU \
-                --port 8090 \
-                --host 0.0.0.0 \
-                --mirror-scheme https \
-                --mirror-netloc olah.colt.chalko.com
+          args:
+            - --repos-path
+            - /data/cache
+            - --cache-size-limit
+            - 15GB
+            - --cache-clean-strategy
+            - LRU
+            - --port
+            - "8090"
+            - --host
+            - 0.0.0.0
+            - --mirror-scheme
+            - https
+            - --mirror-netloc
+            - olah.colt.chalko.com
           ports:
             - containerPort: 8090
               name: http
@@ -59,19 +60,22 @@ spec:
               cpu: "2000m"
               memory: "2Gi"
           startupProbe:
-            tcpSocket:
+            httpGet:
+              path: /openapi.json
               port: 8090
-            initialDelaySeconds: 10
+            initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 30
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /openapi.json
               port: 8090
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 3
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /openapi.json
               port: 8090
             initialDelaySeconds: 15
             periodSeconds: 20
