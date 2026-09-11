@@ -83,8 +83,8 @@ EOT
 resource "vault_kubernetes_auth_backend_role" "vault_backup" {
   backend                          = "kubernetes"
   role_name                        = "vault-backup"
-  bound_service_account_names      = ["vault-backup-sa"]
-  bound_service_account_namespaces = ["vault-backup"]
+  bound_service_account_names      = ["vault-backup-sa", "colt-backup-sa"]
+  bound_service_account_namespaces = ["vault-backup", "backup-system"]
   token_policies                   = ["vault-backup"]
   token_ttl                        = 3600
 }
