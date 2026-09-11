@@ -18,5 +18,4 @@ resources:
   - apps/ollama
   - apps/monitoring
   - apps/olah
-  - apps/vault-backup
-  - apps/tfstate-backup
+  - apps/backup-system

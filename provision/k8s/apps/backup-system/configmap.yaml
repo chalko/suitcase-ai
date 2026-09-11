@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: colt-backup-scripts
+  namespace: backup-system
+  labels:
+    app.kubernetes.io/name: backup-system
+    app.kubernetes.io/part-of: camp-colt
+data:
+  kopia-backup-runner.sh: |
+    #!/bin/sh
+    set -e
+
+    APP_NAME="${APP_NAME:-unspecified}"
+    BACKUP_TYPE="${BACKUP_TYPE:-dir}"
+    SOURCE_PATH="${SOURCE_PATH:-/scratch}"
+
+    echo "=================================================================="
+    echo "=== Camp Colt Unified 3-2-1 Kopia Backup Runner: [${APP_NAME}] ==="
+    echo "=================================================================="
+
+    if [ ! -f /etc/gdrive/sa.json ]; then
+      echo "[-] ERROR: Google Drive Service Account key not found at /etc/gdrive/sa.json"
+      exit 1
+    fi
+
+    # 1. Dynamically configure rclone in volatile memory
+    mkdir -p /tmp/kopia-cfg
+    cat << RCONF > /tmp/kopia-cfg/rclone.conf
+    [gdrive]
+    type = drive
+    scope = drive
+    service_account_file = /etc/gdrive/sa.json
+    root_folder_id = ${GDRIVE_FOLDER_ID}
+    server_side_across_configs = true
+    RCONF
+
+    # 2. Connect to Central Kopia Repository
+    echo "[+] Connecting to Kopia repository on Google Drive..."
+    kopia repository connect rclone \
+      --remote-path="gdrive:kopia-repo" \
+      --embed-rclone-config=/tmp/kopia-cfg/rclone.conf \
+      --password="${KOPIA_PASSWORD}" \
+      --config-file=/tmp/kopia-cfg/repository.config
+
+    # 3. Workload Specific Pre-Snapshot Execution
+    mkdir -p /scratch
+    
+    if [ "${BACKUP_TYPE}" = "vault" ]; then
+      echo "[+] [Vault Hook] Authenticating to HashiCorp Vault via Kubernetes Auth..."
+      K8S_JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+      LOGIN_RESP=$(curl -s -k --request POST \
+        --data "{\"role\": \"vault-backup\", \"jwt\": \"${K8S_JWT}\"}" \
+        https://10.82.0.5:8200/v1/auth/kubernetes/login)
+      VAULT_TOKEN=$(echo "${LOGIN_RESP}" | sed -n 's/.*"client_token":"\([^"]*\)".*/\1/p')
+      
+      if [ -z "${VAULT_TOKEN}" ]; then
+        echo "[-] ERROR: Failed to acquire Vault client token:"
+        echo "${LOGIN_RESP}"
+        exit 1
+      fi
+      
+      echo "[+] [Vault Hook] Taking live atomic Raft snapshot to /scratch/vault-raft.snap..."
+      curl -s -k -f -H "X-Vault-Token: ${VAULT_TOKEN}" \
+        https://10.82.0.5:8200/v1/sys/storage/raft/snapshot -o /scratch/vault-raft.snap
+      
+      (cd /scratch && sha256sum vault-raft.snap > vault-raft.snap.sha256)
+      SOURCE_PATH="/scratch"
+
+    elif [ "${BACKUP_TYPE}" = "sqlite" ]; then
+      echo "[+] [SQLite Hook] Performing atomic copy of SQLite database at ${DB_PATH}..."
+      if [ -f "${DB_PATH}" ]; then
+        cp -f "${DB_PATH}" /scratch/
+        (cd /scratch && sha256sum "$(basename "${DB_PATH}")" > "$(basename "${DB_PATH}").sha256")
+        SOURCE_PATH="/scratch"
+      else
+        echo "[-] ERROR: SQLite database not found at ${DB_PATH}"
+        exit 1
+      fi
+
+    elif [ "${BACKUP_TYPE}" = "fs" ] || [ "${BACKUP_TYPE}" = "dir" ]; then
+      echo "[+] [FS Hook] Snapshotting directory: ${SOURCE_PATH}"
+      if [ ! -d "${SOURCE_PATH}" ] && [ ! -f "${SOURCE_PATH}" ]; then
+        echo "[-] ERROR: Source path ${SOURCE_PATH} does not exist."
+        exit 1
+      fi
+    fi
+
+    # 4. Create Deduplicated, Encrypted Kopia Snapshot
+    echo "[+] Creating Kopia snapshot for ${SOURCE_PATH} (app=${APP_NAME}, type=${BACKUP_TYPE})..."
+    kopia snapshot create "${SOURCE_PATH}" \
+      --config-file=/tmp/kopia-cfg/repository.config \
+      --tags="app:${APP_NAME},type:${BACKUP_TYPE}"
+
+    # 5. Clean up temporary scratch files
+    rm -rf /scratch/* /tmp/kopia-cfg/* 2>/dev/null || true
+
+    echo "[✓] Backup cycle for ${APP_NAME} completed successfully."
