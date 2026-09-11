@@ -22,7 +22,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: litellm
-          image: ghcr.io/berriai/litellm:v1.61.16
+          image: ghcr.io/berriai/litellm:main-v1.61.16-nightly
           imagePullPolicy: IfNotPresent
           args:
             - "--config"
