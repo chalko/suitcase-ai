@@ -8,8 +8,11 @@ spec:
     kind: ClusterRepository
     name: colt-gdrive-repo
   copyMethod: Direct
+  credentialProjection:
+    enabled: true
   sources:
-    - pvc:
+    - acknowledgeLiveMutation: true
+      pvc:
         name: litellm-db-pvc
   retention:
     keepDaily: 14
