@@ -17,9 +17,12 @@ spec:
       labels:
         app: litellm
     spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: litellm
-          image: ghcr.io/berriai/litellm:main-latest
+          image: ghcr.io/berriai/litellm:v1.61.16
           imagePullPolicy: IfNotPresent
           args:
             - "--config"
@@ -36,7 +39,10 @@ spec:
                   name: litellm-secrets
                   key: master-key
             - name: DATABASE_URL
-              value: "postgresql://postgres:postgres@localhost:5432/litellm"
+              valueFrom:
+                secretKeyRef:
+                  name: litellm-secrets
+                  key: database-url
           volumeMounts:
             - name: config-volume
               mountPath: /app/config.yaml
@@ -73,9 +79,34 @@ spec:
             - name: POSTGRES_USER
               value: "postgres"
             - name: POSTGRES_PASSWORD
-              value: "postgres"
+              valueFrom:
+                secretKeyRef:
+                  name: litellm-secrets
+                  key: db-password
             - name: POSTGRES_DB
               value: "litellm"
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+                - -d
+                - litellm
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+                - -d
+                - litellm
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
           volumeMounts:
             - name: database-volume
               mountPath: /var/lib/postgresql/data
