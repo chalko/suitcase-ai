@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: coredns-colt-pdb
+  namespace: dns
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: coredns-colt
