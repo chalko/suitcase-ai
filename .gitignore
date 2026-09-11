@@ -21,6 +21,7 @@ id_ed25519*
 .gc/
 .agents/hooks.json
 rigs/
+tmp/
 
 # Terraform / OpenTofu
 **/.terraform/
