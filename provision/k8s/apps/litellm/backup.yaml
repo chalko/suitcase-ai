@@ -1,0 +1,30 @@
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: litellm-backup-policy
+  namespace: litellm
+spec:
+  repository:
+    kind: ClusterRepository
+    name: colt-gdrive-repo
+  copyMethod: Direct
+  sources:
+    - pvc:
+        name: litellm-db-pvc
+  retention:
+    keepDaily: 14
+    keepWeekly: 6
+    keepMonthly: 13
+    keepAnnual: 1
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: litellm-backup-schedule
+  namespace: litellm
+spec:
+  policyRef:
+    name: litellm-backup-policy
+  schedule:
+    cron: "20 3 * * *"
+    concurrencyPolicy: Forbid

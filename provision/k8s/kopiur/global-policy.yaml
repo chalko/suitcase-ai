@@ -1,0 +1,14 @@
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: gfs-standard-policy
+  namespace: kopiur-system
+spec:
+  repository:
+    kind: ClusterRepository
+    name: colt-gdrive-repo
+  retention:
+    keepDaily: 14
+    keepWeekly: 6
+    keepMonthly: 13
+    keepAnnual: 1

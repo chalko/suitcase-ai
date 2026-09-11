@@ -1,0 +1,30 @@
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: gitea-backup-policy
+  namespace: gitea
+spec:
+  repository:
+    kind: ClusterRepository
+    name: colt-gdrive-repo
+  copyMethod: Direct
+  sources:
+    - pvc:
+        name: gitea-data
+  retention:
+    keepDaily: 14
+    keepWeekly: 6
+    keepMonthly: 13
+    keepAnnual: 1
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: gitea-backup-schedule
+  namespace: gitea
+spec:
+  policyRef:
+    name: gitea-backup-policy
+  schedule:
+    cron: "0 3 * * *"
+    concurrencyPolicy: Forbid

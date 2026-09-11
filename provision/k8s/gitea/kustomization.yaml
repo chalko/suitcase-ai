@@ -7,5 +7,4 @@ resources:
   - release.yaml
   - runner-configmap.yaml
   - runner.yaml
-  - backup-configmap.yaml
-  - backup-cronjob.yaml
+  - backup.yaml

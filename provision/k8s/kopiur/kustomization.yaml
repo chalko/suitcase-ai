@@ -3,4 +3,5 @@ kind: Kustomization
 
 resources:
   - release.yaml
-  - backup.yaml
+  - cluster-repository.yaml
+  - global-policy.yaml

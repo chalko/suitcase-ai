@@ -1,0 +1,41 @@
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: open-webui-backup-policy
+  namespace: open-webui
+spec:
+  repository:
+    kind: ClusterRepository
+    name: colt-gdrive-repo
+  copyMethod: Direct
+  sources:
+    - pvc:
+        name: open-webui-pvc
+  hooks:
+    beforeSnapshot:
+      - workloadExec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: open-webui
+          container: open-webui
+          command:
+            - python3
+            - -c
+            - "import sqlite3; con = sqlite3.connect('/app/backend/data/webui.db'); con.execute('PRAGMA wal_checkpoint(TRUNCATE);'); con.close()"
+  retention:
+    keepDaily: 14
+    keepWeekly: 6
+    keepMonthly: 13
+    keepAnnual: 1
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: open-webui-backup-schedule
+  namespace: open-webui
+spec:
+  policyRef:
+    name: open-webui-backup-policy
+  schedule:
+    cron: "15 3 * * *"
+    concurrencyPolicy: Forbid

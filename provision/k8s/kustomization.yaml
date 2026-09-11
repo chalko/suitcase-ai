@@ -19,3 +19,4 @@ resources:
   - apps/monitoring
   - apps/olah
   - apps/backup-system
+  - kopiur

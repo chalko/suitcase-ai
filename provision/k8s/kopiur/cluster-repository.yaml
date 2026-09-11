@@ -1,0 +1,20 @@
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: ClusterRepository
+metadata:
+  name: colt-gdrive-repo
+spec:
+  allowedNamespaces:
+    all: true
+  credentialProjection:
+    allowed: true
+  backend:
+    gdrive:
+      folderId: "1t4bisvrqc3Pg2isoTiI6vSGvshxx-gZq"
+      credentialsSecretRef:
+        name: colt-kopia-backup-secret
+        namespace: kopiur-system
+  encryption:
+    passwordSecretRef:
+      name: colt-kopia-backup-secret
+      namespace: kopiur-system
+      key: KOPIA_PASSWORD

@@ -1,0 +1,30 @@
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: harbor-backup-policy
+  namespace: harbor
+spec:
+  repository:
+    kind: ClusterRepository
+    name: colt-gdrive-repo
+  copyMethod: Direct
+  sources:
+    - pvc:
+        name: database-data-harbor-database-0
+  retention:
+    keepDaily: 14
+    keepWeekly: 6
+    keepMonthly: 13
+    keepAnnual: 1
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: harbor-backup-schedule
+  namespace: harbor
+spec:
+  policyRef:
+    name: harbor-backup-policy
+  schedule:
+    cron: "30 3 * * *"
+    concurrencyPolicy: Forbid
