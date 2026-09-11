@@ -28,7 +28,18 @@ data "talos_machine_configuration" "colt_controlplane" {
               routes    = [{ network = "0.0.0.0/0", gateway = "10.82.0.1" }]
             }
           ]
-          nameservers = ["10.5.110.3", "10.82.0.1"]
+          nameservers = ["10.82.50.2", "10.82.0.1"]
+          extraHostEntries = [
+            {
+              ip = "10.82.50.10"
+              aliases = [
+                "harbor.colt.chalko.com",
+                "gitea.colt.chalko.com",
+                "olah.colt.chalko.com",
+                "litellm.colt.chalko.com"
+              ]
+            }
+          ]
         }
         time = {
           servers = ["10.5.110.3", "10.5.110.1"]
@@ -63,7 +74,18 @@ data "talos_machine_configuration" "colt_worker" {
               routes    = [{ network = "0.0.0.0/0", gateway = "10.82.0.1" }]
             }
           ]
-          nameservers = ["10.5.110.3", "10.82.0.1"]
+          nameservers = ["10.82.50.2", "10.82.0.1"]
+          extraHostEntries = [
+            {
+              ip = "10.82.50.10"
+              aliases = [
+                "harbor.colt.chalko.com",
+                "gitea.colt.chalko.com",
+                "olah.colt.chalko.com",
+                "litellm.colt.chalko.com"
+              ]
+            }
+          ]
         }
         time = {
           servers = ["10.5.110.3", "10.5.110.1"]
