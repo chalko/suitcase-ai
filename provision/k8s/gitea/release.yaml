@@ -80,6 +80,10 @@ spec:
       mountPath: /data
     redis-cluster:
       enabled: false
+    valkey:
+      enabled: false
+    valkey-cluster:
+      enabled: false
     postgresql:
       enabled: false
     postgresql-ha:
