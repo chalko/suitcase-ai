@@ -129,7 +129,8 @@ The appliance architecture embodies five foundational engineering pillars:
    - Automated Kopia snapshots for persistent state (Vault Raft, Gitea, Harbor, Dolt, and LiteLLM) backed by grandfather-father-son (GFS) retention schedules.
    - Dual-tier backup topology syncing locally to fast appliance storage and off-site to client-side encrypted cloud targets, verified by periodic recovery drills ([`docs/GITEA_DISASTER_RECOVERY.md`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/GITEA_DISASTER_RECOVERY.md)).
 5. **Sub-300W Power Efficiency:**
-   - Peak synthetic inference draw remains strictly under 300W (2.5A @ 120V), fitting standard North American residential circuits.
+   - Peak synthetic inference draw across the entire appliance remains strictly under 300W (~297W / 2.5A @ 120V): `colt-gpu-01` (~220W peak), `colt-cp-01` (~65W peak), network switch (~4W peak), and NVMe cache (~8W peak).
+   - Runs comfortably on standard North American 120V / 15A residential circuits, portable generators, or compact UPS batteries.
    - Passive and convective chimney airflow design within the 8U 10-inch form factor maintains low noise and reliable thermal margins.
 
 ---
