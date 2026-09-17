@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
+  - secrets.yaml
   - release.yaml
   - pvc-grafana.yaml
   - deployment-proxmox-exporter.yaml
