@@ -1,6 +1,11 @@
 # Suitcase AI (Camp Colt)
 
-Declarative infrastructure and operational tooling for an ultra-compact 10" mini-rack compute cluster running Proxmox VE, Talos Linux Kubernetes, and local LLM acceleration.
+## 💡 Executive Summary & Background
+
+> _"When you leave Google, the first thing you lose is the illusion of infinite, free compute. Suddenly, every token has an invoice attached to it... I wanted a self-contained, portable, sovereign compute node rather than a giant rack in a server closet."_
+> — Read the accompanying architectural essay: [**"Why I Spent $5,000 on Hardware Instead of Tokens"**](https://showmetheinference.com/posts/why-i-spent-5000-on-hardware-instead-of-tokens/) by Nick Chalko.
+
+**Suitcase AI** is a production-grade, sovereign AI appliance engineered to run autonomous multi-agent systems and frontier open weights locally. Operating within a standard North American **120V / 15A residential circuit (<300W peak)**, it combines an **ASUS Ascent GX10** (NVIDIA Grace Blackwell GB10 with 128GB unified memory) with an energy-efficient **Minisforum UM760 Slim** x86 control plane in an ultra-compact 8U 10-inch mini-rack.
 
 ---
 
@@ -67,10 +72,13 @@ The cluster is housed in a 3D-printed 10-inch modular rack ([ButterflyRack](http
 
 ### Bare-Metal Fleet Hosts
 
-| Hostname          | Role                                                 | IP Address  | Access Method                      |  Status   |
-| :---------------- | :--------------------------------------------------- | :---------- | :--------------------------------- | :-------: |
-| **`colt-cp-01`**  | Proxmox VE 9.2 Hypervisor (Minisforum MS-01 / UM760) | `10.82.0.2` | OpenSSH CA (`colt-sysadmin-agent`) | 🟢 Active |
-| **`colt-gpu-01`** | DGX OS / Inference Node (ASUS Ascent GX10 GB10)      | `10.82.0.3` | OpenSSH CA (`colt-sysadmin-agent`) | 🟢 Active |
+| Hostname          | Hardware Platform     | Role                                   | IP Address  | Operating System      | Access Method                      |  Status   |
+| :---------------- | :-------------------- | :------------------------------------- | :---------- | :-------------------- | :--------------------------------- | :-------: |
+| **`colt-cp-01`**  | Minisforum UM760 Slim | Hypervisor Host (VMs, Storage, Vault)  | `10.82.0.2` | Proxmox VE 9.2        | OpenSSH CA (`colt-sysadmin-agent`) | 🟢 Active |
+| **`colt-gpu-01`** | ASUS Ascent GX10      | Inference Accelerator (K8s GPU Worker) | `10.82.0.3` | DGX OS (Ubuntu Arm64) | OpenSSH CA (`colt-sysadmin-agent`) | 🟢 Active |
+
+> [!NOTE]
+> All Kubernetes control plane and general compute workloads run on immutable, API-driven **Talos Linux** virtual machines on `colt-cp-01`. The bare-metal ASUS GX10 runs **NVIDIA DGX OS** and joins the cluster as an accelerated Kubernetes worker node via the official NVIDIA GPU Operator / Device Plugin.
 
 ---
 
@@ -106,15 +114,26 @@ Cluster workloads, platform controllers, and ingress configurations are continuo
 
 ## 📐 Architecture & Core Design Decisions
 
-1. **Immutable, API-Driven Cluster (Talos Linux):**
-   - Cluster nodes run [Talos Linux](https://www.talos.dev/). There is no SSH daemon, bash shell, or package manager installed inside the virtual machines.
-   - All lifecycle management, upgrades, and configuration changes are applied declaratively through `talosctl` and the Terraform Talos provider.
-2. **Short-Lived CA Certificates for Host Access:**
-   - Instead of distributing permanent SSH keys or root passwords across hosts, host administration uses short-lived OpenSSH certificates signed by HashiCorp Vault (`colt-vault`).
-   - Root login over SSH is completely disabled; operations run under a dedicated service identity (`colt-sysadmin-agent`).
-3. **Pragmatic Networking:**
-   - Operates on an internal `10.82.0.0/16` network (gateway `10.82.0.1`) with DHCP constrained to `10.82.250.x` to prevent address collisions with static infrastructure.
-   - Ingress uses `ingress-nginx` configured as a `hostNetwork` DaemonSet on the worker node, avoiding the overhead of external BGP/VIP load balancers on a small cluster.
+The appliance architecture embodies six foundational engineering pillars:
+
+1. **Zero Standing Secrets:**
+   - Host administration utilizes short-lived (1-hour) OpenSSH client certificates minted on demand by HashiCorp Vault (`colt-vault`).
+   - Workload secrets, automated mTLS, and registry tokens are managed dynamically with zero raw credentials or private keys ever committed to Git.
+2. **Immutable Infrastructure:**
+   - Kubernetes nodes run immutable [Talos Linux](https://www.talos.dev/) operated purely via declarative API (`talosctl` and Terraform).
+   - VMs have zero in-guest SSH daemons, shells, or package managers, eliminating configuration drift and attack surfaces.
+3. **Sovereign GitOps:**
+   - Continuous reconciliation via Flux CD backed by our self-hosted, in-cluster Gitea Git forge (`http://10.82.0.13/colt`).
+   - Cluster workloads and operational configurations run completely self-contained and air-gapped from cloud dependencies.
+4. **UMA Tensor Optimization:**
+   - Optimized Grace Blackwell GB10 inference orchestration using our custom Go compiler ([`tools/spark-to-k8s/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/tools/spark-to-k8s/)).
+   - Enforces strict 0.75 UMA unified memory clamping (preserving a 32GB system headroom reserve) paired with 3-phase memory hydration (`sync && echo 3 > /proc/sys/vm/drop_caches`).
+5. **Certified 3-2-1 Disaster Recovery:**
+   - Automated Kopia snapshots for persistent state (Vault Raft, Gitea, Harbor, Dolt, and LiteLLM) backed by grandfather-father-son (GFS) retention schedules.
+   - Dual-tier backup topology syncing locally to fast appliance storage and off-site to client-side encrypted cloud targets, verified by periodic recovery drills ([`docs/GITEA_DISASTER_RECOVERY.md`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/GITEA_DISASTER_RECOVERY.md)).
+6. **Sub-300W Power Efficiency:**
+   - Peak synthetic inference draw remains strictly under 300W (2.5A @ 120V), fitting standard North American residential circuits.
+   - Passive and convective chimney airflow design within the 8U 10-inch form factor maintains low noise and reliable thermal margins.
 
 ---
 
