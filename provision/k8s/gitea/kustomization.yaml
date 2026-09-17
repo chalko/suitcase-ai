@@ -6,5 +6,6 @@ resources:
   - pvc.yaml
   - release.yaml
   - runner-configmap.yaml
+  - runner-secret.yaml
   - runner.yaml
   - backup.yaml
