@@ -63,7 +63,6 @@ Restricts allowed certificate principals:
 ```text
 colt-sysadmin-agent
 colt-sysadmin
-sysadmin-agent
 ```
 
 ### 3. Sudoers Rule (`/etc/sudoers.d/99-colt-sysadmin-agent`)

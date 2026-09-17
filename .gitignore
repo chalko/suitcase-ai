@@ -40,5 +40,7 @@ colt-kubeconfig
 colt-talosconfig
 *-kubeconfig
 *-talosconfig
+*talosconfig
+provision/talos/
 CuuEybg5
 /suitecase-ai-20250916.jpg
