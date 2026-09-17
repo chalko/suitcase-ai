@@ -34,6 +34,7 @@ spec:
     strategy:
       type: Recreate
     image:
+      registry: docker.io
       repository: gitea/gitea
       tag: "1.24.5"
       rootless: true
