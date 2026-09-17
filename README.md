@@ -5,7 +5,7 @@
 > _"When you leave Google, the first thing you lose is the illusion of infinite, free compute. Suddenly, every token has an invoice attached to it... I wanted a self-contained, portable, sovereign compute node rather than a giant rack in a server closet."_
 > — Read the accompanying architectural essay: [**"Why I Spent $5,000 on Hardware Instead of Tokens"**](https://showmetheinference.com/posts/why-i-spent-5000-on-hardware-instead-of-tokens/) by Nick Chalko.
 
-**Suitcase AI** is a production-grade, sovereign AI appliance engineered to run autonomous multi-agent systems and frontier open weights locally. Operating within a standard North American **120V / 15A residential circuit (<300W peak)**, it combines an **ASUS Ascent GX10** (NVIDIA Grace Blackwell GB10 with 128GB unified memory) with an energy-efficient **Minisforum UM760 Slim** x86 control plane in an ultra-compact 8U 10-inch mini-rack.
+**Suitcase AI** is a production-grade, sovereign AI appliance engineered to run autonomous multi-agent systems and frontier open weights locally. Operating within a standard North American **120V / 15A residential circuit (~297W peak)**, it combines an **ASUS Ascent GX10** (NVIDIA Grace Blackwell GB10 with 128GB unified memory) with an energy-efficient **Minisforum UM760 Slim** x86 control plane in an ultra-compact 8U 10-inch mini-rack.
 
 ---
 
