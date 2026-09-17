@@ -1,0 +1,42 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: external-secrets
+  namespace: external-secrets
+spec:
+  interval: 1h
+  url: https://charts.external-secrets.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-secrets
+  namespace: external-secrets
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: external-secrets
+      version: "0.10.3"
+      sourceRef:
+        kind: HelmRepository
+        name: external-secrets
+        namespace: external-secrets
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    installCRDs: true
+    nodeSelector:
+      kubernetes.io/arch: amd64
+    webhook:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+    certController:
+      nodeSelector:
+        kubernetes.io/arch: amd64

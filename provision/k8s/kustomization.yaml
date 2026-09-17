@@ -7,6 +7,7 @@ resources:
   - apps/dns
   - ingress
   - vault/vault-auth-rbac.yaml
+  - external-secrets
   - gitea
   - nvidia
   - cert-manager/release.yaml
