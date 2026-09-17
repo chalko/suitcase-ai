@@ -17,7 +17,7 @@ spec:
   chart:
     spec:
       chart: gitea
-      version: "10.6.0"
+      version: "12.2.0"
       sourceRef:
         kind: HelmRepository
         name: gitea-charts
@@ -35,7 +35,7 @@ spec:
       type: Recreate
     image:
       repository: gitea/gitea
-      tag: "1.22.6"
+      tag: "1.24.5"
       rootless: true
     gitea:
       admin:

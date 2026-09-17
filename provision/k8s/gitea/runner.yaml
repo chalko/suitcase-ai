@@ -50,7 +50,7 @@ spec:
               cpu: "2"
               memory: "4Gi"
         - name: runner
-          image: gitea/act_runner:0.2.11
+          image: gitea/act_runner:0.2.12
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
