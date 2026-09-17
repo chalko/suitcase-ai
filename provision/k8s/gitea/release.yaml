@@ -72,8 +72,6 @@ spec:
           PATH: "/data/git/lfs"
         actions:
           ENABLED: "true"
-    actions:
-      enabled: false
     persistence:
       enabled: true
       claimName: gitea-data
