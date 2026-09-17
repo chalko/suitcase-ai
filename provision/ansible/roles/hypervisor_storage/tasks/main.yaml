@@ -7,7 +7,7 @@
     state: present
     extra_zfs_properties:
       quota: 100G
-      sharenfs: "rw=@10.7.82.15:10.7.82.16:@10.7.82.0/24,all_squash,anonuid=1000,anongid=1000,async,no_subtree_check"
+      sharenfs: "rw=@10.7.82.15:10.7.82.16:@10.7.82.0/24,all_squash,anonuid=1000,anongid=1000,async,no_subtree_check,insecure"
 
 - name: Ensure Fog Gitea backup mount directory permissions and ownership
   ansible.builtin.file:
@@ -30,3 +30,20 @@
     src: /local-fast-zfs/fog/backups/gitea
     dest: /local-fast-zfs/backups/gitea
     state: link
+
+- name: Ensure Colt tfstate backup ZFS dataset exists with quota and sharenfs
+  community.general.zfs:
+    name: local-fast-zfs/colt/backups/tfstate
+    state: present
+    extra_zfs_properties:
+      quota: 50G
+      sharenfs: "rw=@10.82.0.0/16,all_squash,anonuid=1000,anongid=1000,async,no_subtree_check,insecure"
+
+- name: Ensure Colt tfstate backup mount directory permissions and ownership
+  ansible.builtin.file:
+    path: /local-fast-zfs/colt/backups/tfstate
+    owner: "1000"
+    group: "1000"
+    mode: "0775"
+    state: directory
+
