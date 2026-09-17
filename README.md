@@ -114,7 +114,7 @@ Cluster workloads, platform controllers, and ingress configurations are continuo
 
 ## 📐 Architecture & Core Design Decisions
 
-The appliance architecture embodies six foundational engineering pillars:
+The appliance architecture embodies five foundational engineering pillars:
 
 1. **Zero Standing Secrets:**
    - Host administration utilizes short-lived (1-hour) OpenSSH client certificates minted on demand by HashiCorp Vault (`colt-vault`).
@@ -125,13 +125,10 @@ The appliance architecture embodies six foundational engineering pillars:
 3. **Sovereign GitOps:**
    - Continuous reconciliation via Flux CD backed by our self-hosted, in-cluster Gitea Git forge (`http://10.82.0.13/colt`).
    - Cluster workloads and operational configurations run completely self-contained and air-gapped from cloud dependencies.
-4. **UMA Tensor Optimization:**
-   - Optimized Grace Blackwell GB10 inference orchestration using our custom Go compiler ([`tools/spark-to-k8s/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/tools/spark-to-k8s/)).
-   - Enforces strict 0.75 UMA unified memory clamping (preserving a 32GB system headroom reserve) paired with 3-phase memory hydration (`sync && echo 3 > /proc/sys/vm/drop_caches`).
-5. **Certified 3-2-1 Disaster Recovery:**
+4. **Certified 3-2-1 Disaster Recovery:**
    - Automated Kopia snapshots for persistent state (Vault Raft, Gitea, Harbor, Dolt, and LiteLLM) backed by grandfather-father-son (GFS) retention schedules.
    - Dual-tier backup topology syncing locally to fast appliance storage and off-site to client-side encrypted cloud targets, verified by periodic recovery drills ([`docs/GITEA_DISASTER_RECOVERY.md`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/GITEA_DISASTER_RECOVERY.md)).
-6. **Sub-300W Power Efficiency:**
+5. **Sub-300W Power Efficiency:**
    - Peak synthetic inference draw remains strictly under 300W (2.5A @ 120V), fitting standard North American residential circuits.
    - Passive and convective chimney airflow design within the 8U 10-inch form factor maintains low noise and reliable thermal margins.
 
