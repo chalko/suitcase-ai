@@ -4,3 +4,5 @@ kind: Kustomization
 resources:
   - release.yaml
   - backup.yaml
+  - secrets.yaml
+  - setup-proxy-cache.yaml
