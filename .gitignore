@@ -42,5 +42,8 @@ colt-talosconfig
 *-talosconfig
 *talosconfig
 provision/talos/
+# Local image scratch
+/*.jpg
+/*.png
+docs/assets/suitecase-ai-20250916.jpg
 CuuEybg5
-/suitecase-ai-20250916.jpg
