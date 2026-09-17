@@ -22,7 +22,7 @@ spec:
   chart:
     spec:
       chart: harbor
-      version: "1.16.0"
+      version: "1.19.2"
       sourceRef:
         kind: HelmRepository
         name: goharbor
@@ -70,10 +70,6 @@ spec:
           storageClass: local-path
     trivy:
       enabled: false
-    notary:
-      enabled: false
-    chartmuseum:
-      enabled: false
     portal:
       nodeSelector:
         kubernetes.io/arch: amd64
@@ -87,8 +83,10 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
     database:
-      nodeSelector:
-        kubernetes.io/arch: amd64
+      internal:
+        nodeSelector:
+          kubernetes.io/arch: amd64
     redis:
-      nodeSelector:
-        kubernetes.io/arch: amd64
+      internal:
+        nodeSelector:
+          kubernetes.io/arch: amd64
