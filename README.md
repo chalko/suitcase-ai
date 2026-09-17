@@ -29,7 +29,7 @@ The cluster is housed in a 3D-printed 10-inch modular rack ([ButterflyRack](http
 <tr>
 <td width="48%" valign="top">
 
-<img src="docs/assets/suitcase-ai-20260916.jpg" alt="Suitcase AI / Camp Colt 10-inch Mini-Rack" width="100%" />
+<img src="docs/assets/suitcase-ai-20260916.jpg" alt="The Suitcase AI rig: A 10-inch minirack with the ASUS Ascent GX10 inference unit (Unit 02) on top and the local control plane node (Unit 01) below." width="100%" />
 
 </td>
 <td width="52%" valign="top">
