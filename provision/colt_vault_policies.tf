@@ -88,3 +88,16 @@ resource "vault_kubernetes_auth_backend_role" "vault_backup" {
   token_policies                   = ["vault-backup"]
   token_ttl                        = 3600
 }
+
+# ------------------------------------------------------------------------------
+# 5. Kubernetes Auth Backend Role for External Secrets Operator (ESO)
+# ------------------------------------------------------------------------------
+resource "vault_kubernetes_auth_backend_role" "external_secrets" {
+  backend                          = "kubernetes"
+  role_name                        = "external-secrets"
+  bound_service_account_names      = ["external-secrets"]
+  bound_service_account_namespaces = ["external-secrets"]
+  token_policies                   = ["colt-workload"]
+  token_ttl                        = 3600
+}
+
