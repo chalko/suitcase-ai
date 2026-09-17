@@ -21,7 +21,7 @@ spec:
         node-role.kubernetes.io/worker: worker
       containers:
         - name: ollama
-          image: ollama/ollama:0.5.11
+          image: ollama/ollama:0.34.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 11434
