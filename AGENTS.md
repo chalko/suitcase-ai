@@ -57,3 +57,7 @@ within the Suitcase AI initiative.
      before declaring the task complete.
    - **Pre-flight Checks:** Always run pre-flight syntax checks, dry-run plans (`terraform plan`,
      `kubectl --dry-run=client`), and network verifications before committing changes.
+
+5. **Release Promotion & Public Egress:**
+
+   - **EXPRESS PERMISSION REQUIRED FOR PUBLIC PROMOTION:** **NEVER** promote to the `public` branch (via `scripts/promote-to-public.sh`, `git push colt public`, or PR) without express, explicit permission from the user in the active conversation. Passing preflight scans (`./scripts/preflight-public-scan.sh`) and build tests is a necessary prerequisite, but autonomous promotion to `public` is strictly forbidden.
