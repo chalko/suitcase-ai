@@ -18,9 +18,16 @@ The goal is a compact, power-efficient, and quiet homelab setup designed to run 
 
 ## 🛠️ Physical 10" Mini-Rack Layout
 
-![Suitcase AI / Camp Colt 10" Mini-Rack](docs/assets/suitecase-ai-20250916.jpg)
-
 The cluster is housed in a 3D-printed 10-inch modular rack ([ButterflyRack](https://github.com/axiopaladin/ButterflyRack)):
+
+<table>
+<tr>
+<td width="48%" valign="top">
+
+<img src="docs/assets/suitecase-ai-20250916.jpg" alt="Suitcase AI / Camp Colt 10-inch Mini-Rack" width="100%" />
+
+</td>
+<td width="52%" valign="top">
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -39,6 +46,10 @@ The cluster is housed in a 3D-printed 10-inch modular rack ([ButterflyRack](http
 │ 1-2U│ [ Base Shelf / PDU Power Distribution & Bricks ]      │
 └─────┴───────────────────────────────────────────────────────┘
 ```
+
+</td>
+</tr>
+</table>
 
 ### Physical Hardware Bill of Materials
 
