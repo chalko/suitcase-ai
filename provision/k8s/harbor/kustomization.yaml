@@ -12,6 +12,10 @@ configMapGenerator:
   - name: harbor-setup-proxy-cache-script
     files:
       - setup-proxy-cache.sh=scripts/setup-proxy-cache.sh
+    options:
+      labels:
+        app.kubernetes.io/name: harbor-setup-proxy-cache
+        app.kubernetes.io/part-of: camp-colt
 
 generatorOptions:
   disableNameSuffixHash: true
