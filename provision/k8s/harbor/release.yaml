@@ -19,6 +19,7 @@ metadata:
   namespace: harbor
 spec:
   interval: 1h
+  timeout: 10m
   chart:
     spec:
       chart: harbor
