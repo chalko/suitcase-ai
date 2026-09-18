@@ -69,7 +69,7 @@ sequenceDiagram
     P1B-->>K8s: Exit Code 0
 
     K8s->>P1C: Launch Phase 1C (Privileged busybox)
-    Note over P1C: Execute: sync; echo 3 > /proc/sys/vm/drop_caches.<br/>Frees page tables for UMA memory pool.
+    Note over P1C: Execute sync and flush drop_caches.<br/>Frees page tables for UMA memory pool.
     P1C-->>K8s: Exit Code 0
 
     K8s->>P2: Launch Phase 2 (Runtime NIM Inference Engine)
