@@ -8,7 +8,7 @@
 
 **Tech Stack:** Olah / Python caching proxy, ModelDepot storage tier (`/mnt/model-depot`), ReadyLocker fast tier (`/workspace/models/fast-cache`), HashiCorp Vault (`secret/colt/huggingface`, `secret/colt/ngc`), Traefik Ingress, Flux CD GitOps.
 
-**Spec:** [docs/storage_tiering_model_depot_ready_locker.md](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/storage_tiering_model_depot_ready_locker.md)
+**Spec:** [docs/storage_tiering_model_depot_ready_locker.md](../storage_tiering_model_depot_ready_locker.md)
 
 ## Global Constraints
 

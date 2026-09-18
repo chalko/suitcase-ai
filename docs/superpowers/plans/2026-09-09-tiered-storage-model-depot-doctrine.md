@@ -8,7 +8,7 @@
 
 **Tech Stack:** Kubernetes (Talos Linux / Proxmox VE), NVIDIA NIM (Nemotron 49B FP8 on Grace Blackwell GB10), Bash / rsync / Btrfs snapshot tooling, Flux GitOps.
 
-**Spec:** [`scai/docs/storage_doctrine_model_depot_and_ready_locker.md`](../../../scai/docs/storage_doctrine_model_depot_and_ready_locker.md), Bead `sa-etk`, and FRAGO directive `lu-wisp-hj5vek`.
+**Spec:** [docs/storage_tiering_model_depot_ready_locker.md](../../storage_tiering_model_depot_ready_locker.md), Bead `sa-etk`.
 
 ---
 
@@ -49,11 +49,11 @@
    - Create `scripts/depot-nim-sync.sh` implementing ModelDepot backup, snapshotting, and ReadyLocker eviction workflows.
    - Ensure executable permissions and test argument handling.
 
-4. **Task 4: Verification, GitOps Push, Bead Closure, and Strategic Reporting**
+4. **Task 4: Verification, GitOps Push, and Bead Closure**
    - Run end-to-end dry-run verification of Kubernetes manifests and documentation links.
    - Commit and push to `colt/main`.
    - Close bead `sa-etk` via `bd close`.
-   - Send confirmation mail to `scai/peggy` via `gc mail send`.
+   - Record task completion and operational verification report.
 
 ---
 
@@ -69,15 +69,15 @@
 
 **Interfaces:**
 
-- Consumes: `scai/docs/storage_doctrine_model_depot_and_ready_locker.md`
-- Produces: Definitive storage architecture guide for Camp Colt operators and agents.
+- Consumes: Storage doctrine specifications
+- Produces: Definitive storage architecture guide for Camp Colt operators and sysadmins.
 
 - [ ] **Step 1: Write `docs/storage_tiering_model_depot_ready_locker.md`**
 
 ```markdown
 # Storage Logistics Doctrine: ModelDepot & ReadyLocker
 
-> [!IMPORTANT] > **Authority**: Promulgated by Margaret "Peggy" Carter (`scai/peggy` — Strategic Theater Director) & Direct Operator Directive.
+> [!IMPORTANT] > **Authority**: System Operator Directive.
 > **Scope**: Mandatory across Camp Colt and `suitcase-ai` infrastructure (`colt-gpu-01`, `colt-cp-01`, and sovereign edge appliances).
 > **Supersedes**: Legacy "Dewpoint" storage naming conventions (`docs/DEWPOINT.md`).
 
@@ -303,17 +303,6 @@ git push colt main
 bd close sa-etk -r "Migrated storage architecture to ModelDepot and ReadyLocker doctrine across docs, manifests, and sync scripts"
 ```
 
-- [ ] **Step 4: Send strategic confirmation mail to `scai/peggy`**
+- [ ] **Step 4: Document task completion**
 
-```bash
-gc mail send scai/peggy --subject "RE: FRAGO: Formal Storage Doctrine Migration — ModelDepot & ReadyLocker" --body "Peggy,
-
-The storage doctrine migration for Camp Colt and suitcase-ai (bead sa-etk) has been completed and pushed to colt/main:
-
-1. Documentation: Authored docs/storage_tiering_model_depot_ready_locker.md and docs/MODEL_DEPOT.md, and updated docs/DEWPOINT.md with deprecation notices.
-2. Inference Manifests: Updated provision/k8s/apps/inference/nemotron-49b.yaml with model-depot-storage (/mnt/model-depot), local-ready-cache (/workspace/models/fast-cache), depot-hydration-preflight, and semantic capability selectors (accelerator: gb10, nvidia.com/gpu.present: 'true').
-3. Automation Tooling: Deployed scripts/depot-nim-sync.sh for operational snapshotting and ReadyLocker hydration/eviction.
-4. GitOps Reconciled: Committed and pushed to colt/main (ready for Flux sync).
-
-Bead sa-etk is closed."
-```
+Confirm storage doctrine migration across manifests, tooling, and documentation.

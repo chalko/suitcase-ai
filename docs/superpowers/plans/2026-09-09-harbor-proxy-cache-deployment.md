@@ -8,7 +8,7 @@
 
 **Tech Stack:** Harbor v2.11.x (or pinned lightweight distribution), Kubernetes (Talos Linux 1.14 / K8s 1.36.4), HashiCorp Vault (`10.82.0.5:8200`), Traefik/Ingress-Nginx, Flux CD GitOps.
 
-**Spec:** [docs/storage_tiering_model_depot_ready_locker.md](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/storage_tiering_model_depot_ready_locker.md)
+**Spec:** [docs/storage_tiering_model_depot_ready_locker.md](../storage_tiering_model_depot_ready_locker.md)
 
 ## Global Constraints
 

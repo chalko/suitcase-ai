@@ -13,4 +13,4 @@ power states, network bridge attachment) for Fog guest workloads running on
 
 `colt-sysadmin` is responsible for hypervisor uptime, host networking, and
 container/VM allocations here. In-guest OS configurations, Kubernetes workloads,
-and service deployments within these VMs are managed by `fog/kaylee`.
+and service deployments within these VMs are managed by the Fog sysadmin (`fog-sysadmin`).

@@ -11,7 +11,7 @@
 
 **Tech Stack:** Kubernetes (v1.36.4 on Talos Linux v1.14.0), Flux CD `helm-controller` (v2), HashiCorp Vault (`10.82.0.5:8200`), MetalLB (`colt-ingress-pool`), `ingress-nginx` Helm chart, `gitea` Helm chart.
 
-**Spec:** [docs/PUBLIC_RELEASE_RUNBOOK.md](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/PUBLIC_RELEASE_RUNBOOK.md) & [AGENTS.md](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/AGENTS.md)
+**Spec:** [docs/PUBLIC_RELEASE_RUNBOOK.md](../PUBLIC_RELEASE_RUNBOOK.md) & [AGENTS.md](../../AGENTS.md)
 
 ## Global Constraints
 

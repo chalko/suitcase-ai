@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Restore connectivity and unblock Kaylee's legacy Fog Gitea backup CronJob by declaratively configuring the NFS export flags (`insecure`, unprivileged port support), host network binding (`10.7.82.10` on VLAN 613 / `vmbr0`), and ZFS dataset properties on `colt-cp-01` via Ansible.
+**Goal:** Restore connectivity and unblock the legacy Fog Gitea backup CronJob by declaratively configuring the NFS export flags (`insecure`, unprivileged port support), host network binding (`10.7.82.10` on VLAN 613 / `vmbr0`), and ZFS dataset properties on `colt-cp-01` via Ansible.
 
 **Architecture:** Update the declarative Ansible role `hypervisor_storage` on `colt-cp-01` to enforce proper ZFS `sharenfs` options (adding `insecure` to permit unprivileged Kubernetes client source ports), ensure the `10.7.82.10` IP is bound and reachable on the Fog management bridge/VLAN, and verify end-to-end NFS RPC mountability from Fog node IPs without mutating foreign cluster state.
 
@@ -13,7 +13,7 @@
 - **Storage / Export Subsystem:** OpenZFS (`local-fast-zfs/fog/backups/gitea`), Linux `nfs-kernel-server`
 - **Network Fabrics:** Camp Colt (`10.82.0.0/16`, untagged `vmbr0`) and Fog VLAN 613 (`10.7.82.0/24`, `vmbr0.613` / `vmbr0`)
 
-**Spec / Context:** Mail `lu-wisp-9aw2h4` from `fog/kaylee` ("Re: Camp Colt Architecture / Fog Gitea Backup & NFS")
+**Spec / Context:** Specification: Fog Gitea Backup & NFS Export Configuration
 
 ---
 
@@ -166,7 +166,7 @@ Expected: Output shows `10.7.82.0/24(...)insecure` in `exports -v` and `10.7.82.
 
 ---
 
-### Task 2: Validate End-to-End NFS Connectivity and Send Confirmation to Kaylee
+### Task 2: Validate End-to-End NFS Connectivity and Operational Verification
 
 **Files:**
 
@@ -191,6 +191,6 @@ git add provision/ansible/roles/hypervisor_storage/tasks/main.yaml
 git commit -m "fix(storage): add insecure NFS flag and 10.7.82.10 binding for Fog Gitea backups"
 ```
 
-- [ ] **Step 3: Send confirmation mail to Kaylee (`fog/kaylee`) via `gc mail send`**
+- [ ] **Step 3: Document operational verification of NFS export**
 
-Send notification mail confirming that NFS export options on `10.7.82.10:/local-fast-zfs/fog/backups/gitea` have been refreshed with `insecure` unprivileged port support and host IP reachability.
+Confirm that NFS export options on `10.7.82.10:/local-fast-zfs/fog/backups/gitea` have been refreshed with `insecure` unprivileged port support and host IP reachability.

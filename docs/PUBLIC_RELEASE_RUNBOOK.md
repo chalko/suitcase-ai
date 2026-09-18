@@ -10,7 +10,7 @@ This runbook outlines the operational lifecycle, security boundaries, and step-b
 flowchart TD
     subgraph Internal_Gitea["Internal Gitea (gitea.colt.chalko.com)"]
         direction TB
-        G_MAIN["Branch: main\n(Active sysadmin/agentic development)"]
+        G_MAIN["Branch: main\n(Active infrastructure & platform development)"]
         PROMO["Promotion Gate\n(scripts/promote-to-public.sh)"]
         SCAN["Zero-Plaintext Security Scan\n(scripts/preflight-public-scan.sh)"]
         G_PUB["Branch: public\n(Curated public release snapshot)"]
@@ -39,7 +39,7 @@ flowchart TD
 
 | Branch / Remote            | Purpose                                                            | Access Control                                    |
 | :------------------------- | :----------------------------------------------------------------- | :------------------------------------------------ |
-| **`colt/main`** (Gitea)    | Internal development, agent automation, ongoing feature branches.  | Internal agents & sysadmins only.                 |
+| **`colt/main`** (Gitea)    | Internal development, automation, and ongoing feature branches.    | Authorized sysadmins and platform operators only. |
 | **`colt/public`** (Gitea)  | Gatekeeper branch containing sanitized, validated release commits. | Protected; updated only via promotion script.     |
 | **`github/main`** (GitHub) | Public mirror of `colt/public` for open-source consumers.          | Public read-only; pushed automatically via CI/CD. |
 

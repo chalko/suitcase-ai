@@ -8,7 +8,7 @@
 
 **Tech Stack:** Kubernetes (Talos Linux 1.14.0 / K8s 1.36.4), HashiCorp Vault (`10.82.0.5:8200`), Gitea 1.22.6, `gitea/act_runner:0.2.11`, `docker:27.5.1-dind`, Flux CD GitOps.
 
-**Spec:** [docs/PUBLIC_RELEASE_RUNBOOK.md](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/PUBLIC_RELEASE_RUNBOOK.md)
+**Spec:** [docs/PUBLIC_RELEASE_RUNBOOK.md](../PUBLIC_RELEASE_RUNBOOK.md)
 
 ## Global Constraints
 

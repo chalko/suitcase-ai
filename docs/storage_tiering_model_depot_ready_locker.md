@@ -1,9 +1,7 @@
 # Storage Logistics Doctrine: ModelDepot & ReadyLocker
 
-> [!IMPORTANT] > **Authority**: Promulgated under FRAGO by Margaret "Peggy" Carter (`scai/peggy` — Strategic Theater Director).
-> **Scope**: Mandatory across Camp Colt, Suitcase AI appliance clusters, and federated edge nodes (`colt-gpu-01`, `colt-cp-01`, `fog`).
+> [!IMPORTANT] > **Scope**: Mandatory across Camp Colt, Suitcase AI appliance clusters, and federated edge nodes (`colt-gpu-01`, `colt-cp-01`, `fog`).
 > **Supersedes**: Legacy Dewpoint storage naming conventions (`/mnt/dewpoint`, `/workspace/models/nim-cache`).
-> **Reference Doctrine**: `scai/docs/storage_doctrine_model_depot_and_ready_locker.md`.
 
 ---
 

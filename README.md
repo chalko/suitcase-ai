@@ -108,7 +108,7 @@ Cluster workloads, platform controllers, and ingress configurations are continuo
 - **Forge URL:** `http://10.82.0.13/colt/suitcase-ai.git` (in-cluster: `http://gitea.gitea.svc.cluster.local:3000/colt/suitcase-ai.git`)
 - **CLI Management:** `tea` CLI configured with default `colt` profile
 - **Source Sync:** `GitRepository/flux-system` polls in-cluster Gitea `main` branch
-- **Root Manifests:** [`clusters/camp-colt/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/clusters/camp-colt/) and [`provision/k8s/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/k8s/)
+- **Root Manifests:** [`clusters/camp-colt/`](clusters/camp-colt/) and [`provision/k8s/`](provision/k8s/)
 
 ---
 
@@ -127,7 +127,7 @@ The appliance architecture embodies five foundational engineering pillars:
    - Cluster workloads and operational configurations run completely self-contained and air-gapped from cloud dependencies.
 4. **Certified 3-2-1 Disaster Recovery:**
    - Automated Kopia snapshots for persistent state (Vault Raft, Gitea, Harbor, Dolt, and LiteLLM) backed by grandfather-father-son (GFS) retention schedules.
-   - Dual-tier backup topology syncing locally to fast appliance storage and off-site to client-side encrypted cloud targets, verified by periodic recovery drills ([`docs/GITEA_DISASTER_RECOVERY.md`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/GITEA_DISASTER_RECOVERY.md)).
+   - Dual-tier backup topology syncing locally to fast appliance storage and off-site to client-side encrypted cloud targets, verified by periodic recovery drills ([`docs/GITEA_DISASTER_RECOVERY.md`](docs/GITEA_DISASTER_RECOVERY.md)).
 5. **Power Efficiency:**
    - Peak synthetic inference draw across the entire appliance remains strictly under 300W (~297W / 2.5A @ 120V): `colt-gpu-01` (~220W peak), `colt-cp-01` (~65W peak), network switch (~4W peak), and NVMe cache (~8W peak).
    - Runs comfortably on standard North American 120V / 15A residential circuits, portable generators, or compact UPS batteries.
@@ -139,7 +139,7 @@ The appliance architecture embodies five foundational engineering pillars:
 
 Personal homelab workloads that ideally belong on separate physical hardware, but are co-located on `colt-cp-01` to make the best use of available physical capacity:
 
-- **Segregated Management:** Allocations are declared in [`provision/fog/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/provision/fog/) for hypervisor tracking, but in-guest OS configurations and application workloads are managed externally.
+- **Segregated Management:** Allocations are declared in [`provision/fog/`](provision/fog/) for hypervisor tracking, but in-guest OS configurations and application workloads are managed externally.
 - **Network Isolation:** All Fog resources run on a dedicated, isolated VLAN (**VLAN 613** on `10.7.82.0/24`) and do not route into the Camp Colt `10.82.0.0/16` fabric.
 
 | VMID        | Guest Name       | Type           | Allocated Resources          | Network                 | Role                         |

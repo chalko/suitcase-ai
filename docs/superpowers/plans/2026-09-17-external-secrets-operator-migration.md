@@ -8,7 +8,7 @@
 
 **Tech Stack:** External Secrets Operator v0.10.3+, Flux CD v2.x, HashiCorp Vault 1.18+, Talos Linux v1.14 / K8s v1.36.4, Terraform, Dolt/Beads (`bd`).
 
-**Spec:** [`plans/2026-09-17-external-secrets-operator-migration.md`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/docs/superpowers/plans/2026-09-17-external-secrets-operator-migration.md) (implements `sa-rxx`, `sa-2pq`, and prerequisites for `sa-zdt`).
+**Spec:** [`2026-09-17-external-secrets-operator-migration.md`](2026-09-17-external-secrets-operator-migration.md) (implements `sa-rxx`, `sa-2pq`, and prerequisites for `sa-zdt`).
 
 ## Global Constraints
 

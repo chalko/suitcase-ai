@@ -71,7 +71,7 @@ Every compiled inference workload executes a strict 3-phase initialization seque
 
 ## 4. `spark-to-k8s` Compiler Tooling
 
-The type-safe compiler is implemented in Go under [`tools/spark-to-k8s/`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/tools/spark-to-k8s/) using Go `text/template` rendering.
+The type-safe compiler is implemented in Go under [`tools/spark-to-k8s/`](../tools/spark-to-k8s/) using Go `text/template` rendering.
 
 ### Usage Commands
 

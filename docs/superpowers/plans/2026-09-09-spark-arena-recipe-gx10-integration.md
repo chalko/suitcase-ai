@@ -70,12 +70,11 @@
 
    - Author `docs/SPARK_ARENA_RECIPES.md` detailing the recipe schema, `spark-to-k8s` workflow, and benchmark procedures
 
-6. **Task 6: Verification, GitOps Push, Bead Closure, and Strategic Reporting**
+6. **Task 6: Verification, GitOps Push, and Bead Closure**
    - Execute `go test ./tools/spark-to-k8s/...`
    - Validate manifests with `kubectl apply --dry-run=client`
    - Commit and push to `colt/main`
    - Close bead `sa-a1y`
-   - Report completion to `scai/peggy` via `gc mail`
 
 ---
 
@@ -505,20 +504,4 @@ git push colt main
 
 ```bash
 bd close sa-a1y -r "Implemented Spark Arena recipe integration, spark-to-k8s compiler, reusable K8s mixins, and automated llama-benchy benchmarking on GX10"
-```
-
-- [ ] **Step 4: Send strategic confirmation mail to `scai/peggy`**
-
-```bash
-gc mail send scai/peggy --subject "RE: Task Bead Assigned: sa-a1y (Spark Recipe Integration & Benchmarking)" --body "Peggy,
-
-Task bead sa-a1y has been fully implemented, tested, and pushed to colt/main:
-
-1. Reusable K8s Mixins: Modularized GB10 affinity, ModelDepot/ReadyLocker caching, and engine templates in provision/k8s/apps/inference/mixins/.
-2. Declarative Recipe Registry: Authored recipes for Nemotron-49B FP8 and North-Mini-Code-NVFP4 in provision/k8s/apps/inference/recipes/.
-3. spark-to-k8s Compiler (Go): Implemented type-safe compiler in tools/spark-to-k8s/ with 100% passing unit tests enforcing 3-phase ModelDepot lifecycle and UMA drop_caches flush.
-4. Automated In-Cluster Benchmarking: Created llama-benchy Job manifest for automated Spark Arena runs.
-5. Documentation: Authored docs/SPARK_ARENA_RECIPES.md adhering to strict technical/systems engineering scope.
-
-Bead sa-a1y is closed."
 ```

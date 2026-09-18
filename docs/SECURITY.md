@@ -39,7 +39,7 @@ sequenceDiagram
 
 ## ⚙️ Target Host Trust Configuration
 
-Every bare-metal host in Camp Colt (`colt-cp-01`, `colt-gpu-01`) is provisioned using [`scripts/provision_host_colt_sysadmin.sh`](file:///home/luna-mayor-agent/luna/rigs/suitcase-ai/scripts/provision_host_colt_sysadmin.sh):
+Every bare-metal host in Camp Colt (`colt-cp-01`, `colt-gpu-01`) is provisioned using [`scripts/provision_host_colt_sysadmin.sh`](../scripts/provision_host_colt_sysadmin.sh):
 
 ### 1. Trusted CA Keys (`/etc/ssh/trusted-user-ca-keys.pem`)
 

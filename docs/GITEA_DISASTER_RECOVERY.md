@@ -146,7 +146,7 @@ sha256sum -c "${LATEST_ZIP}.sha256"
 ### Audit Execution Metadata
 
 - **Drill Date:** 2026-09-10
-- **Executor:** Camp Colt Sysadmin Agent (`colt-sysadmin`)
+- **Executor:** Camp Colt Sysadmin (`colt-sysadmin`)
 - **Appliance Cluster:** Camp Colt (`admin@camp-colt-k8s` @ `https://10.82.0.10:6443`)
 - **Target Archive:** `gitea-dump-20260910_175512.zip` (Retrieved from `gdrive:daily/`)
 - **Checksum Status:** `SHA256 OK` (Verified against `gitea-dump-20260910_175512.zip.sha256`)
